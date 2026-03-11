@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="theme-color" content="#2d5a27"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="한국어 타이핑"/>
+<title>Korean American Typing Trainer</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #f5f2ee;
+  --bg2:      #ede9e3;
+  --bg3:      #e5e0d8;
+  --border:   #d8d2c8;
+  --text:     #1a1a1a;
+  --muted:    #888880;
+  --light:    #b5b0a8;
+  --accent:   #2d5a27;
+  --accent2:  #4a8c42;
+  --accent-bg:#e8f0e6;
+  --correct:  #2d5a27;
+  --wrong:    #c0392b;
+  --card:     #f0ece6;
+  --max:      760px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased}
+
+/* ── HEADER */
+header{border-bottom:1px solid var(--border);padding:20px 0 16px;margin-bottom:20px}
+.header-inner{max-width:var(--max);margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;flex-direction:column;gap:2px}
+.logo-ko{font-family:'Noto Sans KR',sans-serif;font-size:20px;font-weight:700;color:var(--accent);letter-spacing:1px}
+.logo-en{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.stats-bar{display:flex;gap:20px}
+.stat{display:flex;flex-direction:column;align-items:flex-end}
+.stat-val{font-size:18px;font-weight:600;color:var(--accent)}
+.stat-label{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+
+/* ── TABS */
+.tabs{max-width:var(--max);margin:0 auto 20px;padding:0 20px;display:flex;gap:4px;border-bottom:1px solid var(--border)}
+.tab{padding:10px 16px;border:none;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── MAIN CONTENT */
+.main{max-width:var(--max);margin:0 auto;padding:0 20px 80px}
+
+/* ── CATEGORY PILLS */
+.categories{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.cat-pill{padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:500;color:var(--muted);background:var(--bg);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.cat-pill:hover{border-color:var(--accent);color:var(--accent)}
+.cat-pill.active{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+
+/* ── PROGRESS */
+.progress-wrap{height:2px;background:var(--border);border-radius:2px;margin-bottom:20px;overflow:hidden}
+.progress-bar{height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s}
+
+/* ── TIMER */
+.timer-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px}
+.timer-left{flex:1}
+.timer-live{display:flex;align-items:baseline;gap:6px;margin-bottom:6px}
+.timer-val{font-size:30px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;min-width:74px;transition:color 0.2s}
+.timer-val.warning{color:#b8860b}
+.timer-val.danger{color:var(--wrong);animation:pulse 0.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.timer-unit{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.pace-wrap{height:3px;background:var(--border);border-radius:3px;overflow:hidden}
+.pace-bar{height:100%;border-radius:3px;transition:width 0.1s,background 0.2s}
+.diff-btns{display:flex;gap:6px;margin-top:8px}
+.diff-btn{padding:4px 10px;border:1px solid var(--border);border-radius:14px;background:var(--bg);color:var(--muted);font-size:10px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:inherit}
+.diff-btn:hover{border-color:var(--accent);color:var(--accent)}
+.diff-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.timer-records{display:flex;gap:16px}
+.t-rec{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.t-rec-val{font-size:14px;font-weight:600;color:var(--text)}
+.t-rec-val.gold{color:#b8860b}
+.t-rec-label{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+
+/* ── TYPING CARD */
+.typing-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;position:relative}
+.typing-card::before{content:'';position:absolute;top:0;left:24px;right:24px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.phrase-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.phrase-cat{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);background:var(--accent-bg);padding:3px 8px;border-radius:4px}
+.phrase-counter{font-size:11px;color:var(--muted)}
+.korean-target{font-family:'Noto Sans KR',sans-serif;font-size:clamp(22px,5vw,32px);line-height:1.7;margin-bottom:8px;min-height:50px}
+.char{display:inline-block;transition:color 0.08s}
+.char.correct{color:var(--correct)}
+.char.wrong{color:var(--wrong);background:rgba(192,57,43,0.08);border-radius:2px}
+.char.current{color:var(--text);border-bottom:2px solid var(--accent)}
+.char.pending{color:var(--light)}
+.english-trans{font-size:13px;color:var(--muted);margin-bottom:4px;font-style:italic}
+.romanization{font-size:12px;color:var(--accent2);margin-bottom:8px;min-height:18px;font-family:'IBM Plex Mono',monospace}
+
+/* ── DEFINITION BOX */
+.def-toggle{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);cursor:pointer;margin-bottom:8px;display:none;font-weight:600;background:none;border:none;font-family:inherit;padding:0}
+.def-toggle:hover{text-decoration:underline}
+.def-box{background:var(--accent-bg);border:1px solid rgba(45,90,39,0.2);border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:12px;line-height:1.75;display:none}
+.def-box.visible{display:block}
+.def-en{color:var(--text);margin-bottom:6px}
+.def-ko{font-family:'Noto Sans KR',sans-serif;color:var(--accent);font-size:13px}
+.def-date{font-size:10px;color:var(--muted);font-style:italic;margin-top:4px;font-family:'IBM Plex Mono',monospace}
+.def-why{font-size:11px;color:var(--accent2);margin-top:6px;padding-top:6px;border-top:1px solid rgba(45,90,39,0.15);font-weight:500}
+
+/* ── PB BADGE */
+.pb-badge{font-size:11px;color:var(--correct);margin-bottom:10px;min-height:18px;transition:opacity 0.3s}
+.pb-badge.hidden{opacity:0}
+.pb-badge.gold{color:#b8860b}
+
+/* ── INPUT */
+.typing-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px 16px;font-family:'Noto Sans KR',sans-serif;font-size:18px;color:var(--text);outline:none;transition:border-color 0.15s,box-shadow 0.15s;caret-color:var(--accent)}
+.typing-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,90,39,0.1)}
+.typing-input.error{border-color:var(--wrong);animation:shake 0.25s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ── CONTROLS */
+.controls{display:flex;gap:8px;margin-bottom:24px}
+.btn{flex:1;padding:11px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px}
+.btn:hover{background:var(--bg3);border-color:var(--muted)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn-active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-active:hover{background:var(--accent2);border-color:var(--accent2)}
+
+/* ── MINI KEYBOARD */
+.kb-section{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px}
+.kb-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.kb-rows{display:flex;flex-direction:column;gap:5px;align-items:center}
+.kb-row{display:flex;gap:4px}
+.key{width:32px;height:32px;background:var(--bg);border:1px solid var(--border);border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.12s}
+.key:hover{border-color:var(--accent);background:var(--accent-bg)}
+.key-ko{font-family:'Noto Sans KR',sans-serif;font-size:11px;color:var(--accent);line-height:1}
+.key-en{font-size:8px;color:var(--muted);line-height:1}
+
+/* ── RESULT FLASH */
+.result-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.85);background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:28px 48px;text-align:center;opacity:0;pointer-events:none;transition:all 0.25s;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,0.12)}
+.result-flash.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.result-ko{font-family:'Noto Sans KR',sans-serif;font-size:26px;color:var(--accent);margin-bottom:4px}
+.result-wpm{font-size:11px;color:var(--muted);letter-spacing:1px}
+
+/* ── GLOSSARY */
+#glossary-view,#keyboard-view{display:none}
+.gloss-grid{display:flex;flex-direction:column;gap:6px}
+.gi{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:13px 16px;cursor:pointer;transition:all 0.15s}
+.gi:hover{border-color:var(--accent);background:var(--accent-bg)}
+.gi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.gi-ko{font-family:'Noto Sans KR',sans-serif;font-size:18px;color:var(--text)}
+.gi-right{text-align:right;flex-shrink:0}
+.gi-en{font-size:11px;color:var(--muted)}
+.gi-rom{font-size:10px;color:var(--accent2);font-family:'IBM Plex Mono',monospace;margin-top:2px}
+.gi-cat{font-size:9px;color:var(--light);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.gi-def{font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.6;display:none}
+.gi-def.show{display:block}
+.gi-def-why{color:var(--accent2);font-weight:500;margin-top:4px}
+
+/* ── KEYBOARD VIEW */
+.kb-full-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px}
+.kb-full-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.kb-full-row{display:flex;gap:5px;margin-bottom:5px;flex-wrap:wrap}
+.kb-full-key{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 5px;min-width:44px;text-align:center}
+.kb-full-key .top{font-family:'Noto Sans KR';font-size:14px;color:var(--accent)}
+.kb-full-key .bot{font-size:10px;color:var(--muted);margin-top:2px}
+.hint{background:var(--accent-bg);border:1px solid rgba(45,90,39,0.2);border-radius:8px;padding:14px 16px;margin-bottom:12px;font-size:12px;line-height:1.8;color:var(--text)}
+.hint strong{color:var(--accent)}
+
+/* ── OFFLINE BADGE */
+.offline{position:fixed;bottom:16px;right:16px;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--correct);display:flex;align-items:center;gap:6px;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.offline-dot{width:5px;height:5px;background:var(--correct);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* ── SCROLLBARS */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+#glossary-view,#keyboard-view{max-height:calc(100vh - 180px);overflow-y:auto;padding-bottom:60px}
+
+@media(max-width:480px){
+  .main{padding:0 12px 80px}
+  .typing-card{padding:16px}
+  .controls{flex-direction:column}
+  .stats-bar{gap:12px}
+  .diff-btns{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-ko">한국어 타이핑</div>
+      <div class="logo-en">Korean American Typing Trainer</div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-val" id="stat-wpm">0</div><div class="stat-label">WPM</div></div>
+      <div class="stat"><div class="stat-val" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('practice')">⌨ Practice</button>
+  <button class="tab" onclick="switchTab('glossary')">📖 Glossary</button>
+  <button class="tab" onclick="switchTab('keyboard')">🗺 Keyboard</button>
+</div>
+
+<div class="main">
+
+<!-- PRACTICE -->
+<div id="practice-view">
+  <div class="categories" id="cat-pills"></div>
+  <div class="progress-wrap"><div class="progress-bar" id="prog" style="width:0%"></div></div>
+
+  <div class="timer-row">
+    <div class="timer-left">
+      <div class="timer-live">
+        <div class="timer-val" id="timer">0.0</div>
+        <div class="timer-unit">sec</div>
+        <div id="diff-label" style="font-size:11px;color:var(--muted);margin-left:10px"></div>
+      </div>
+      <div class="pace-wrap"><div class="pace-bar" id="pace" style="width:0%;background:var(--correct)"></div></div>
+      <div class="diff-btns">
+        <button class="diff-btn active" data-diff="easy" onclick="setDiff('easy')">🌱 Easy</button>
+        <button class="diff-btn" data-diff="medium" onclick="setDiff('medium')">⚡ Medium</button>
+        <button class="diff-btn" data-diff="hard" onclick="setDiff('hard')">🔥 Hard</button>
+      </div>
+    </div>
+    <div class="timer-records">
+      <div class="t-rec"><div class="t-rec-val" id="t-last">—</div><div class="t-rec-label">Last</div></div>
+      <div class="t-rec"><div class="t-rec-val gold" id="t-pb">—</div><div class="t-rec-label">🏆 Best</div></div>
+    </div>
+  </div>
+
+  <div class="typing-card">
+    <div class="phrase-meta">
+      <span class="phrase-cat" id="p-cat">—</span>
+      <span class="phrase-counter" id="p-count">1 / 1</span>
+    </div>
+    <div class="korean-target" id="k-display"></div>
+    <div class="english-trans" id="e-display"></div>
+    <div class="romanization" id="r-display"></div>
+    <button class="def-toggle" id="def-toggle" onclick="toggleDef()">▸ Context</button>
+    <div class="def-box" id="def-box">
+      <div class="def-en" id="def-en"></div>
+      <div class="def-ko" id="def-ko"></div>
+      <div class="def-date" id="def-date"></div>
+      <div class="def-why" id="def-why"></div>
+    </div>
+    <div class="pb-badge hidden" id="pb-badge"></div>
+    <input class="typing-input" id="input" type="text"
+      placeholder="한국어로 입력하세요…"
+      autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"/>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="toggleRoman()">👁 Romanization</button>
+    <button class="btn" id="shuffle-btn" onclick="toggleShuffle()">🔀 Shuffle</button>
+    <button class="btn btn-primary" onclick="nextPhrase()">Next →</button>
+  </div>
+
+  <div class="kb-section">
+    <div class="kb-label">두벌식 keyboard reference</div>
+    <div class="kb-rows" id="mini-kb"></div>
+  </div>
+</div>
+
+<!-- GLOSSARY -->
+<div id="glossary-view">
+  <div class="categories" id="gloss-pills"></div>
+  <div class="gloss-grid" id="gloss-grid"></div>
+</div>
+
+<!-- KEYBOARD -->
+<div id="keyboard-view">
+  <div class="kb-full-wrap">
+    <div class="kb-full-title">Standard Korean Keyboard — 두벌식 (Dubeolsik)</div>
+    <div id="full-kb"></div>
+  </div>
+  <div class="hint"><strong>Enable Korean on iPhone:</strong> Settings → General → Keyboard → Keyboards → Add New Keyboard → Korean (2-Set) → tap 🌐 to switch<br/><strong>Enable on Windows:</strong> Settings → Time & Language → Language → Add Korean → Alt+Shift to toggle</div>
+  <div class="hint"><strong>두벌식 rule:</strong> Consonants (자음) on the <strong>left</strong> side · Vowels (모음) on the <strong>right</strong> side<br/>Example: 한국 → ㅎ+ㅏ+ㄴ+ㄱ+ㅜ+ㄱ → type: <strong>g k s r n r</strong></div>
+  <div class="hint"><strong>Timer pace guide:</strong> 🌱 Easy = 0.9s/char &nbsp;·&nbsp; ⚡ Medium = 0.55s/char &nbsp;·&nbsp; 🔥 Hard = 0.30s/char<br/>Color goes green → yellow → red as you use up your time budget for that phrase.</div>
+</div>
+
+</div><!-- /main -->
+
+<div class="result-flash" id="flash">
+  <div class="result-ko">잘했어요!</div>
+  <div class="result-wpm" id="flash-wpm"></div>
+</div>
+
+<div class="offline"><div class="offline-dot"></div>Offline Ready</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DIFFICULTY
+// ═══════════════════════════════════════════════
+const DIFF = {
+  easy:   { pace:0.90, emoji:'🌱' },
+  medium: { pace:0.55, emoji:'⚡' },
+  hard:   { pace:0.30, emoji:'🔥' },
+};
+const WARN=1.4, DANGER=2.0;
+
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+const PHRASES = [
+
+// ── 가족 FAMILY & DYNAMICS ──────────────────────
+{ko:"할머니",en:"grandmother (paternal)",roman:"hal-meo-ni",cat:"가족",
+ def:"Your father's mother. In Korean, each grandparent has a different title depending on which side of the family they're on — a distinction that doesn't exist in English.",
+ date:"Traditional",why:"Knowing the correct title shows respect and prevents awkward moments at family gatherings."},
+{ko:"할아버지",en:"grandfather (paternal)",roman:"hal-a-beo-ji",cat:"가족",
+ def:"Your father's father. Using the right honorific title signals cultural literacy to older family members.",
+ date:"Traditional",why:"Getting this right matters — Korean elders notice when the title is wrong."},
+{ko:"외할머니",en:"grandmother (maternal)",roman:"oe-hal-meo-ni",cat:"가족",
+ def:"Your mother's mother. The '외' prefix marks maternal lineage.",
+ date:"Traditional",why:"Korean Americans often didn't learn the maternal vs paternal distinction — this closes that gap."},
+{ko:"외할아버지",en:"grandfather (maternal)",roman:"oe-hal-a-beo-ji",cat:"가족",
+ def:"Your mother's father. One of four distinct grandparent titles in Korean.",
+ date:"Traditional",why:"This specificity reflects how Korean family structure centers lineage and respect."},
+{ko:"어머니",en:"mother (formal)",roman:"eo-meo-ni",cat:"가족",
+ def:"Formal word for mother. '엄마' is the casual, home version. Using '어머니' with elders or in formal speech is appropriate.",
+ date:"Traditional",why:"Switching between 엄마 and 어머니 shows register awareness — a mark of fluency."},
+{ko:"아버지",en:"father (formal)",roman:"a-beo-ji",cat:"가족",
+ def:"Formal word for father. '아빠' is the casual version. '아버지' is used in formal contexts or when speaking about your father to others.",
+ date:"Traditional",why:"Knowing when to use each form is part of sounding naturally fluent."},
+{ko:"오빠",en:"older brother (female speaker)",roman:"o-ppa",cat:"가족",
+ def:"A girl or woman's older brother. In Korean, sibling terms differ based on the speaker's gender — a system that doesn't exist in English.",
+ date:"Traditional",why:"This distinction surprises many Korean Americans who grew up with English's gender-neutral 'brother.'"},
+{ko:"언니",en:"older sister (female speaker)",roman:"eon-ni",cat:"가족",
+ def:"A girl or woman's older sister. Same word also used affectionately for close older female friends.",
+ date:"Traditional",why:"Understanding when Koreans use family terms for non-relatives is key to natural conversation."},
+{ko:"형",en:"older brother (male speaker)",roman:"hyeong",cat:"가족",
+ def:"A boy or man's older brother. Also used widely in Korean culture beyond family — younger men call close older male friends '형' too.",
+ date:"Traditional",why:"You'll hear this constantly in Korean media and conversations."},
+{ko:"누나",en:"older sister (male speaker)",roman:"nu-na",cat:"가족",
+ def:"A boy or man's older sister. Also used for close older female friends.",
+ date:"Traditional",why:"Part of a four-way sibling honorific system unique to Korean."},
+{ko:"남동생",en:"younger brother",roman:"nam-dong-saeng",cat:"가족",
+ def:"Younger brother — used by speakers of any gender. '남' means male, '동생' means younger sibling.",
+ date:"Traditional",why:"Unlike older sibling terms, younger sibling terms are gender-neutral for the speaker."},
+{ko:"여동생",en:"younger sister",roman:"yeo-dong-saeng",cat:"가족",
+ def:"Younger sister. '여' means female.",
+ date:"Traditional",why:"Once you learn the older sibling system, these feel refreshingly simple."},
+{ko:"삼촌",en:"uncle (father's brother)",roman:"sam-chon",cat:"가족",
+ def:"Paternal uncle. Korean has separate terms for uncles on each side of the family.",
+ date:"Traditional",why:"Using the wrong uncle title is a common Korean American mistake that elders notice."},
+{ko:"외삼촌",en:"uncle (mother's brother)",roman:"oe-sam-chon",cat:"가족",
+ def:"Maternal uncle — your mother's brother. The '외' prefix again marks maternal lineage.",
+ date:"Traditional",why:"The maternal/paternal distinction runs through all Korean family vocabulary."},
+{ko:"고모",en:"aunt (father's sister)",roman:"go-mo",cat:"가족",
+ def:"Your father's sister. A completely different word from '이모' — your mother's sister.",
+ date:"Traditional",why:"Mixing these two up is one of the most common heritage speaker errors."},
+{ko:"이모",en:"aunt (mother's sister)",roman:"i-mo",cat:"가족",
+ def:"Your mother's sister. '이모' is also commonly used as a friendly address for middle-aged women at restaurants.",
+ date:"Traditional",why:"This dual use — family title and social address — reflects how Korean extends family warmth to strangers."},
+{ko:"사촌",en:"cousin",roman:"sa-chon",cat:"가족",
+ def:"Cousin — used for both male and female cousins, all sides of the family.",
+ date:"Traditional",why:"Unlike aunts and uncles, Korean merges cousins into one term."},
+{ko:"며느리",en:"daughter-in-law",roman:"myeo-neu-ri",cat:"가족",
+ def:"Son's wife. A role with significant cultural weight in Korean family dynamics.",
+ date:"Traditional",why:"Understanding this word helps decode the dynamics often discussed in Korean dramas and real family life."},
+{ko:"사위",en:"son-in-law",roman:"sa-wi",cat:"가족",
+ def:"Daughter's husband. Traditionally treated warmly in Korean culture.",
+ date:"Traditional",why:"Korean parents often treat the son-in-law with notable generosity — this word comes up in family conversations a lot."},
+{ko:"시어머니",en:"mother-in-law (husband's mother)",roman:"si-eo-meo-ni",cat:"가족",
+ def:"A wife's mother-in-law — her husband's mother. The 시 (媤) prefix marks the husband's side.",
+ date:"Traditional",why:"The relationship between 시어머니 and 며느리 is central to Korean family dynamics and culture."},
+{ko:"시아버지",en:"father-in-law (husband's father)",roman:"si-a-beo-ji",cat:"가족",
+ def:"A wife's father-in-law — her husband's father.",
+ date:"Traditional",why:"Knowing these terms is essential for any Korean American with Korean in-laws."},
+{ko:"장인어른",en:"father-in-law (wife's father)",roman:"jang-in-eo-reun",cat:"가족",
+ def:"A husband's father-in-law — his wife's father. A separate term from the wife's equivalent.",
+ date:"Traditional",why:"Korean has distinct terms for in-laws depending on your gender — another layer of the honorific system."},
+{ko:"장모님",en:"mother-in-law (wife's mother)",roman:"jang-mo-nim",cat:"가족",
+ def:"A husband's mother-in-law — his wife's mother.",
+ date:"Traditional",why:"The 님 suffix here adds an extra layer of respect, reflecting how Korean in-law relationships are structured."},
+{ko:"손자",en:"grandson",roman:"son-ja",cat:"가족",
+ def:"Grandson. Grandparents use this term with great pride in Korean culture.",
+ date:"Traditional",why:"Korean grandparents often express their deepest hopes through this word."},
+{ko:"손녀",en:"granddaughter",roman:"son-nyeo",cat:"가족",
+ def:"Granddaughter.",
+ date:"Traditional",why:"Understanding these terms helps when Korean grandparents talk about you or your children."},
+{ko:"어른",en:"elder / adult deserving respect",roman:"eo-reun",cat:"가족",
+ def:"Not just 'adult' — an elder who deserves deference. The word carries a strong cultural expectation of respectful behavior.",
+ date:"Traditional",why:"Much of Korean social behavior is organized around the concept of 어른. Knowing this word unlocks a lot of cultural logic."},
+{ko:"존댓말",en:"formal/polite speech",roman:"jon-daet-mal",cat:"가족",
+ def:"The formal speech register in Korean. Marked by endings like -요, -습니다. Required with 어른, strangers, and professional contexts.",
+ date:"Traditional",why:"Heritage speakers often know 반말 but not 존댓말 — the gap that makes them sound like children to Korean elders."},
+{ko:"반말",en:"informal/casual speech",roman:"ban-mal",cat:"가족",
+ def:"Casual speech used between close friends, younger people, or those of equal status. Sounds rude if used with someone who expects 존댓말.",
+ date:"Traditional",why:"Many Korean Americans default to 반말 with everyone — understanding when to switch is a key fluency milestone."},
+{ko:"눈치",en:"social awareness / reading the room",roman:"nun-chi",cat:"가족",
+ def:"The ability to read unspoken social cues, atmosphere, and what someone needs without them saying it. Essential in Korean social life.",
+ date:"Traditional",why:"'눈치 없다' (lacking 눈치) is one of the more pointed criticisms in Korean. This concept governs much of Korean social behavior."},
+{ko:"정",en:"deep emotional bond / attachment",roman:"jeong",cat:"가족",
+ def:"An untranslatable feeling of deep affection and attachment that builds over time through shared experience. Not quite love, not quite friendship — something more accumulated.",
+ date:"Traditional",why:"정 explains why Korean relationships feel so intense — and why leaving feels so hard."},
+{ko:"효도",en:"filial piety / honoring parents",roman:"hyo-do",cat:"가족",
+ def:"The duty and practice of honoring, respecting, and caring for one's parents and ancestors. A Confucian value central to Korean family structure.",
+ date:"Traditional — Confucian influence via Joseon dynasty (1392–1897)",why:"Understanding 효도 explains much of the obligation Korean Americans feel toward family — and the guilt when that obligation isn't met."},
+{ko:"제사",en:"ancestral memorial rite",roman:"je-sa",cat:"가족",
+ def:"A ritual performed on the anniversary of an ancestor's death or on major holidays to honor and remember them. Involves specific foods, bowing, and order of ceremony.",
+ date:"Traditional — practiced for centuries, rooted in Confucian tradition",why:"Many Korean Americans participate in 제사 but don't know the word or what's happening. Understanding it deepens the experience."},
+{ko:"차례",en:"ancestral ritual on holidays",roman:"cha-rye",cat:"가족",
+ def:"Similar to 제사 but performed on major holidays like 설날 and 추석. Simpler in form, focused on the season and gratitude.",
+ date:"Traditional",why:"Knowing the difference between 차례 and 제사 shows deep cultural literacy."},
+{ko:"돌",en:"baby's first birthday celebration",roman:"dol",cat:"가족",
+ def:"The first birthday — a major milestone in Korean culture, celebrated with a special ceremony called 돌잔치 where the baby 'predicts' their future by grabbing objects.",
+ date:"Traditional — dates back to the Joseon era",why:"This is one of the first Korean cultural events Korean American children experience. Knowing the word and meaning matters."},
+{ko:"어른스럽다",en:"to be mature / act grown-up",roman:"eo-reun-seu-reop-da",cat:"가족",
+ def:"To act with the composure and wisdom of an 어른. A compliment when said of a young person.",
+ date:"Traditional",why:"This is one of the highest compliments Korean elders give to younger family members."},
+{ko:"가족",en:"family",roman:"ga-jok",cat:"가족",
+ def:"Family — but with a warmth and centrality in Korean culture that exceeds the English equivalent. In Korean thinking, family is the primary unit of identity.",
+ date:"Traditional",why:"Foundational word. Everything in Korean social life radiates outward from 가족."},
+
+// ── 교회 CHURCH & COMMUNITY ──────────────────────
+{ko:"교회",en:"church",roman:"gyo-hoe",cat:"교회",
+ def:"Church — the center of social life for a huge proportion of Korean Americans. Estimates suggest over 70% of Korean immigrants in the US are Christian.",
+ date:"Christianity arrived in Korea in the late 1800s; Korean American churches became community anchors in the 20th century",why:"For many Korean Americans, 교회 is inseparable from identity, community, and heritage."},
+{ko:"목사님",en:"pastor (honorific)",roman:"mok-sa-nim",cat:"교회",
+ def:"Pastor — with the honorific 님. The spiritual and often social leader of a Korean American church community.",
+ date:"Modern",why:"The 님 suffix is always used — calling a pastor 목사 without 님 is considered disrespectful."},
+{ko:"전도사",en:"deacon / church worker (lower than pastor)",roman:"jeon-do-sa",cat:"교회",
+ def:"A church worker below the rank of ordained pastor — often a youth pastor or ministry worker.",
+ date:"Modern",why:"Korean churches have a well-defined hierarchy that Korean Americans navigate socially."},
+{ko:"장로",en:"elder (church)",roman:"jang-ro",cat:"교회",
+ def:"Church elder — a lay leadership role of high status in Korean Protestant churches.",
+ date:"Modern",why:"Being a 장로 is a mark of social standing in many Korean American communities."},
+{ko:"집사",en:"deacon (church)",roman:"jip-sa",cat:"교회",
+ def:"A deacon — a service role in the church, often handling practical matters.",
+ date:"Modern",why:"This is a common role that Korean American adults take on as they become more established in a church community."},
+{ko:"권사",en:"senior female deaconess",roman:"gwon-sa",cat:"교회",
+ def:"A senior female church role, typically held by women of a certain age and standing. Often the backbone of church operations.",
+ date:"Modern",why:"권사 are the unsung organizers of Korean American church life — the ones who make everything run."},
+{ko:"예배",en:"worship service",roman:"ye-bae",cat:"교회",
+ def:"Worship service — the main Sunday gathering. In Korean American churches this often runs 1.5–2 hours.",
+ date:"Modern",why:"예배 is the rhythmic center of the Korean American church week."},
+{ko:"찬양",en:"praise / worship music",roman:"chan-yang",cat:"교회",
+ def:"Praise and worship — the musical portion of a church service. Often led by a worship team.",
+ date:"Modern",why:"찬양 teams are a major social hub in Korean American youth church culture."},
+{ko:"설교",en:"sermon",roman:"seol-gyo",cat:"교회",
+ def:"The pastor's sermon — central to the Korean Protestant service.",
+ date:"Modern",why:"Many Korean Americans grew up understanding Korean through 설교 before any other context."},
+{ko:"성경",en:"Bible",roman:"seong-gyeong",cat:"교회",
+ def:"The Bible. Korean churches often use both Korean and English Bibles in bilingual services.",
+ date:"Modern",why:"Korean Bible vocabulary is a specific register many Korean Americans have but don't know how to read."},
+{ko:"기도",en:"prayer",roman:"gi-do",cat:"교회",
+ def:"Prayer — spoken individually or collectively. Korean church prayer is often loud, simultaneous, and deeply personal.",
+ date:"Modern",why:"The Korean style of communal, simultaneous prayer (통성기도) is distinct from Western prayer traditions."},
+{ko:"구역",en:"small group / cell group",roman:"gu-yeok",cat:"교회",
+ def:"A small neighborhood or family-based group within a church, typically meeting weekly for Bible study and fellowship.",
+ date:"Modern",why:"구역 is where the tightest social bonds in Korean American churches form — and where Korean adults really practice the language."},
+{ko:"봉사",en:"service / volunteering at church",roman:"bong-sa",cat:"교회",
+ def:"Service — volunteering at church. Korean American churches run on 봉사 from their members: cooking, cleaning, childcare, AV, parking.",
+ date:"Modern",why:"Being asked to do 봉사 is both an obligation and an honor in Korean church culture."},
+{ko:"심방",en:"pastoral home visit",roman:"sim-bang",cat:"교회",
+ def:"A pastoral visit to a member's home — to pray, check in, and strengthen community bonds.",
+ date:"Traditional — long-standing practice in Korean churches",why:"This practice keeps Korean American churches tightly networked in ways Western churches often aren't."},
+{ko:"헌금",en:"offering / tithe",roman:"heon-geum",cat:"교회",
+ def:"Church offering. In Korean American churches, the giving of 헌금 is often a communal, formalized moment in the service.",
+ date:"Modern",why:"Understanding the vocabulary around giving helps Korean Americans participate fully rather than feeling like observers."},
+{ko:"성가대",en:"choir",roman:"seong-ga-dae",cat:"교회",
+ def:"Church choir. A common social community within Korean American churches, often multigenerational.",
+ date:"Modern",why:"The choir is one of the first places Korean Americans of all ages mix and bond across generations."},
+{ko:"주일학교",en:"Sunday school",roman:"ju-il-hak-gyo",cat:"교회",
+ def:"Sunday school — children's religious education program running parallel to the adult service.",
+ date:"Modern",why:"For many Korean American children, 주일학교 is their main exposure to structured Korean-language content."},
+{ko:"새벽기도",en:"early morning prayer",roman:"sae-byeok-gi-do",cat:"교회",
+ def:"Predawn prayer service — typically starting at 5am. A hallmark of Korean church devotion.",
+ date:"Modern — became widespread in Korean churches in the late 20th century",why:"Korean American elders who attend 새벽기도 are often considered the most devoted community members."},
+{ko:"전도",en:"evangelism / outreach",roman:"jeon-do",cat:"교회",
+ def:"The practice of sharing faith with others and inviting them to church. A major activity in Korean American churches.",
+ date:"Modern",why:"전도 is why Korean American churches grow — and why many Korean Americans first heard about community events."},
+{ko:"회식",en:"communal meal after church",roman:"hoe-sik",cat:"교회",
+ def:"Post-service communal eating. In Korean American churches, this often means going to a Korean restaurant together after Sunday service.",
+ date:"Modern",why:"The restaurant after church is as much a part of the Korean American Sunday as the service itself."},
+
+// ── 밥상 FOOD & TABLE CULTURE ──────────────────────
+{ko:"밥",en:"cooked rice / meal",roman:"bap",cat:"밥상",
+ def:"Rice — but also, informally, a meal itself. '밥 먹었어?' (Did you eat?) is a greeting as much as a question.",
+ date:"Traditional",why:"Rice is so central to Korean identity that '밥' means both the food and the act of nourishing someone."},
+{ko:"반찬",en:"side dishes",roman:"ban-chan",cat:"밥상",
+ def:"The array of small shared side dishes that accompany rice in a Korean meal. A meal without 반찬 feels incomplete.",
+ date:"Traditional",why:"The variety and quality of 반찬 is how Korean home cooks express love and effort."},
+{ko:"국",en:"soup / broth dish",roman:"guk",cat:"밥상",
+ def:"A broth-based soup — lighter than 찌개. Almost every Korean meal includes some form of 국.",
+ date:"Traditional",why:"Knowing the difference between 국, 탕, and 찌개 signals real food knowledge."},
+{ko:"찌개",en:"stew (hearty, shared)",roman:"jji-gae",cat:"밥상",
+ def:"A thick, hearty stew — spicier and denser than 국. Shared from a communal pot at the center of the table.",
+ date:"Traditional",why:"The shared 찌개 pot is a symbol of Korean communal eating culture."},
+{ko:"된장찌개",en:"fermented soybean paste stew",roman:"doen-jang-jji-gae",cat:"밥상",
+ def:"One of the most iconic Korean dishes — earthy, savory stew made with 된장 (fermented soybean paste), tofu, vegetables.",
+ date:"Traditional",why:"This is often the dish Korean Americans crave most when homesick. Knowing its full name matters."},
+{ko:"김치찌개",en:"kimchi stew",roman:"gim-chi-jji-gae",cat:"밥상",
+ def:"Stew made with aged kimchi, pork or tuna, tofu. Gets better with older, more sour kimchi.",
+ date:"Traditional",why:"A staple of the Korean home kitchen — and a dish Korean Americans often make for the first time when living alone."},
+{ko:"김치",en:"fermented vegetables (usually cabbage)",roman:"gim-chi",cat:"밥상",
+ def:"Korea's most famous dish — salted, fermented vegetables with chili paste. Hundreds of varieties exist. Central to Korean identity.",
+ date:"Traditional — kimchi-making (김장) dates back at least 1,000 years",why:"Kimchi is a cultural symbol. Korean Americans who grow up making 김장 with family carry that memory their whole lives."},
+{ko:"김장",en:"annual kimchi-making",roman:"gim-jang",cat:"밥상",
+ def:"The communal tradition of making large quantities of kimchi for winter, typically done as a family or neighborhood in late fall.",
+ date:"Traditional — UNESCO recognized 김장 as Intangible Cultural Heritage in 2013",why:"김장 is one of the most important cultural practices Korean Americans either maintain or mourn losing."},
+{ko:"잘 먹겠습니다",en:"I will eat well (said before eating)",roman:"jal meok-get-seum-ni-da",cat:"밥상",
+ def:"Said before a meal — similar to 'bon appétit' but directed toward the person who cooked or provided the meal, expressing gratitude.",
+ date:"Traditional",why:"Forgetting to say this before eating is one of the first things Korean grandparents correct."},
+{ko:"잘 먹었습니다",en:"I ate well (said after eating)",roman:"jal meo-geot-seum-ni-da",cat:"밥상",
+ def:"Said after a meal — expressing gratitude and satisfaction to the host or cook.",
+ date:"Traditional",why:"Both the before and after expressions are expected in Korean table culture. Missing either is noticeable."},
+{ko:"많이 드세요",en:"please eat a lot",roman:"ma-ni deu-se-yo",cat:"밥상",
+ def:"What a host says to encourage guests to eat freely. Refusing more food often requires multiple polite declinations.",
+ date:"Traditional",why:"Korean hospitality is expressed through food — this phrase is its verbal form."},
+{ko:"맛있다",en:"it's delicious",roman:"ma-sit-da",cat:"밥상",
+ def:"Delicious — said during or after a meal. A critical compliment in Korean food culture.",
+ date:"Traditional",why:"Saying this to the cook — especially a grandparent — is one of the most meaningful things you can do."},
+{ko:"국물",en:"broth / soup liquid",roman:"guk-mul",cat:"밥상",
+ def:"The broth or liquid in a soup or stew. Often slurped directly — this is not rude in Korean table culture.",
+ date:"Traditional",why:"Knowing 국물 helps you talk about Korean food beyond just dish names."},
+{ko:"이모",en:"server at a restaurant (informal address)",roman:"i-mo",cat:"밥상",
+ def:"Technically 'aunt (maternal)' — but widely used to address female servers at Korean restaurants. A warm, familiar address.",
+ date:"Modern — informal usage",why:"This is something Korean Americans often hesitate to say but is completely normal and even appreciated in Korean restaurant culture."},
+{ko:"리필",en:"refill (of side dishes)",roman:"ri-pil",cat:"밥상",
+ def:"A loanword from English 'refill' — Korean restaurants typically provide free refills of 반찬. You can ask by saying '리필 돼요?'",
+ date:"Modern",why:"Knowing you can and how to ask for 리필 is practical knowledge every Korean American needs."},
+{ko:"서비스",en:"complimentary item / on the house",roman:"seo-bi-seu",cat:"밥상",
+ def:"In Korean restaurants, '서비스' means a complimentary extra — a free dish, drink, or dessert the restaurant gives as a gift.",
+ date:"Modern — loanword from English 'service' but used differently",why:"This usage surprises most English speakers — it's one of the most useful Korean restaurant vocabulary words."},
+{ko:"포장",en:"takeout / to go",roman:"po-jang",cat:"밥상",
+ def:"Takeout — asking for food to be packaged to take home.",
+ date:"Modern",why:"Simple but essential — Korean Americans often freeze up when trying to ask for takeout in Korean."},
+{ko:"공기밥",en:"individual serving of rice",roman:"gong-gi-bap",cat:"밥상",
+ def:"A single bowl of rice, typically ordered as an add-on at Korean restaurants.",
+ date:"Modern",why:"Ordering 공기밥 추가요 (an extra bowl of rice please) is a practical sentence every Korean restaurant-goer needs."},
+{ko:"숟가락",en:"spoon",roman:"sut-ga-rak",cat:"밥상",
+ def:"Spoon — used for rice and soup in Korean table settings. Unlike many Asian cuisines, Koreans use a spoon for rice, not chopsticks.",
+ date:"Traditional",why:"This surprises many people who assume chopsticks are universal across East Asian food cultures."},
+{ko:"젓가락",en:"chopsticks",roman:"jeot-ga-rak",cat:"밥상",
+ def:"Chopsticks — used for side dishes and other foods in Korean meals, but not for rice.",
+ date:"Traditional",why:"The division of labor between 숟가락 and 젓가락 is distinctly Korean."},
+
+// ── 역사 KOREAN HISTORY & IDENTITY ──────────────────────
+{ko:"단군",en:"Dangun — mythical founder of Korea",roman:"dan-gun",cat:"역사",
+ def:"The legendary founder of Gojoseon, the first Korean kingdom, said to have founded it in 2333 BCE. Born of a heavenly father and a bear-turned-woman.",
+ date:"2333 BCE (mythological) — recorded in Samguk Yusa (13th century)",why:"단군 is the origin story of Korean identity — the reason Koreans call themselves '배달민족' (the people of Baedal)."},
+{ko:"고조선",en:"Gojoseon — first Korean kingdom",roman:"go-jo-seon",cat:"역사",
+ def:"The first recorded Korean state, founded according to legend by 단군 in 2333 BCE. Centered in the Korean peninsula and Manchuria.",
+ date:"2333 BCE – 108 BCE",why:"Understanding 고조선 gives Korean Americans a foundation for the depth of Korean civilization before China or Japan existed in their modern forms."},
+{ko:"삼국시대",en:"Three Kingdoms period",roman:"sam-guk-si-dae",cat:"역사",
+ def:"The era of three competing kingdoms on the Korean peninsula: 고구려 (Goguryeo), 백제 (Baekje), and 신라 (Silla). A formative period for Korean culture, Buddhism, and statecraft.",
+ date:"57 BCE – 668 CE",why:"Much of Korean art, Buddhism, and cultural identity traces back to this era. It's also the inspiration for a huge genre of Korean dramas."},
+{ko:"고구려",en:"Goguryeo — northern kingdom",roman:"go-gu-ryeo",cat:"역사",
+ def:"The northernmost of the Three Kingdoms — a powerful, expansionist state that at its peak covered much of Manchuria and northern Korea.",
+ date:"37 BCE – 668 CE",why:"Korea's modern name derives from 고구려 (Goryeo → Korea). Understanding this traces the thread of Korean identity across millennia."},
+{ko:"신라",en:"Silla — southeastern kingdom",roman:"sil-la",cat:"역사",
+ def:"The southeastern kingdom that unified the peninsula in 668 CE with Tang Chinese support, beginning the Unified Silla period.",
+ date:"57 BCE – 935 CE",why:"신라's unification created the foundation for a single Korean cultural and linguistic identity."},
+{ko:"고려",en:"Goryeo dynasty",roman:"go-ryeo",cat:"역사",
+ def:"The dynasty that reunified Korea after Silla's decline. Famous for celadon pottery, Buddhist scholarship, and invention of the world's first movable metal type printing.",
+ date:"918 – 1392",why:"'Korea' literally comes from '고려.' This dynasty shaped Korean Buddhism, ceramics, and the arts at their height."},
+{ko:"조선시대",en:"Joseon dynasty",roman:"jo-seon-si-dae",cat:"역사",
+ def:"The longest-ruling Korean dynasty — a Confucian monarchy that shaped nearly every aspect of modern Korean culture: family structure, language, social hierarchy, and governance.",
+ date:"1392 – 1897",why:"Most of what Korean Americans recognize as 'traditional Korean culture' — from 효도 to 한복 to Confucian family structure — was codified during the Joseon era."},
+{ko:"훈민정음",en:"Hunminjeongeum — original name for Hangul",roman:"hun-min-jeong-eum",cat:"역사",
+ def:"The original name of the Korean alphabet, meaning 'correct sounds for the instruction of the people.' Created by King Sejong the Great and scholars.",
+ date:"1443 — promulgated 1446",why:"Before Hangul, only the educated elite could write (using Classical Chinese). 훈민정음 democratized literacy — one of history's most significant language events."},
+{ko:"일제강점기",en:"Japanese colonial period",roman:"il-je-gang-jeom-gi",cat:"역사",
+ def:"The period of Japanese colonial rule over Korea. Koreans were forced to take Japanese names, speak Japanese, and abandon Korean cultural identity. A deeply traumatic national period.",
+ date:"1910 – 1945",why:"This era is the single most important historical reference point for understanding Korean national identity, the meaning of independence, and why older Koreans feel what they feel."},
+{ko:"독립운동",en:"independence movement",roman:"dok-nip-un-dong",cat:"역사",
+ def:"The Korean independence movement against Japanese colonial rule — active throughout the colonial period through protests, underground organizing, and armed resistance.",
+ date:"1910 – 1945",why:"Knowing this word gives Korean Americans context for why Korean national identity is so fiercely felt."},
+{ko:"삼일운동",en:"March First Movement",roman:"sam-il-un-dong",cat:"역사",
+ def:"A nationwide nonviolent independence movement that began on March 1, 1919, with the public reading of the Korean Declaration of Independence. Thousands were killed or imprisoned by Japanese authorities.",
+ date:"March 1, 1919",why:"삼일절 (March 1st) is still a national holiday in Korea. This movement is Korea's equivalent of a founding moment of resistance."},
+{ko:"광복절",en:"Liberation Day",roman:"gwang-bok-jeol",cat:"역사",
+ def:"National Liberation Day — marking Korea's liberation from Japanese colonial rule at the end of World War II. Celebrated on August 15.",
+ date:"August 15, 1945",why:"광복절 is one of Korea's most emotionally significant national holidays — the end of 35 years of occupation."},
+{ko:"한국전쟁",en:"Korean War",roman:"han-guk-jeon-jaeng",cat:"역사",
+ def:"The war between North and South Korea, involving UN forces (led by the US) and Chinese support for the North. Ended in an armistice — technically still ongoing.",
+ date:"1950 – 1953 (armistice)",why:"Most Korean American grandparents and many parents were born into or lived through this war. It shaped everything about modern Korea and Korean diaspora."},
+{ko:"분단",en:"division / partition",roman:"bun-dan",cat:"역사",
+ def:"The division of Korea into North and South at the 38th parallel — initially by the US and Soviet Union after WWII, then cemented by the Korean War.",
+ date:"1945 – present",why:"분단 is an open wound in Korean national consciousness. Many Korean families were separated and never reunited."},
+{ko:"이산가족",en:"separated families (by division)",roman:"i-san-ga-jok",cat:"역사",
+ def:"Families torn apart by the division of Korea — relatives on different sides of the 38th parallel who have been unable to meet for decades.",
+ date:"1945 – present",why:"Many Korean American families have 이산가족 stories. This word carries enormous grief."},
+{ko:"민주화운동",en:"pro-democracy movement",roman:"min-ju-hwa-un-dong",cat:"역사",
+ def:"The Korean pro-democracy movement — decades of citizen resistance against authoritarian governments, culminating in the 1987 democratic transition.",
+ date:"1960s – 1987",why:"Modern South Korean democracy was built by citizens who risked their lives. Understanding this shapes respect for what Korea has achieved."},
+{ko:"5·18 민주화운동",en:"May 18th Gwangju Uprising",roman:"o-il-pal min-ju-hwa-un-dong",cat:"역사",
+ def:"The pro-democracy uprising in Gwangju in May 1980, during which citizens rose against the military dictatorship of Chun Doo-hwan. Hundreds were killed.",
+ date:"May 18, 1980",why:"5·18 is a sacred day in Korean democratic history — and the inspiration for the film 택시운전사 (A Taxi Driver, 2017)."},
+{ko:"경제 성장",en:"economic growth / the miracle on the Han River",roman:"gyeong-je seong-jang",cat:"역사",
+ def:"South Korea's extraordinary economic transformation from a war-devastated country to the world's 10th largest economy in just a few decades. Also called '한강의 기적.'",
+ date:"1960s – 1990s",why:"This transformation is the backdrop of every Korean American immigrant family story — parents who came from a developing country and watched it become a global power."},
+{ko:"한강의 기적",en:"Miracle on the Han River",roman:"han-gang-ui gi-jeok",cat:"역사",
+ def:"The phrase describing South Korea's rapid industrialization and economic rise — from one of the world's poorest countries after the Korean War to a global economic powerhouse.",
+ date:"1960s – 1990s",why:"This phrase captures the pride Korean Americans feel in what Korea achieved in a single generation."},
+{ko:"한류",en:"Korean Wave / Hallyu",roman:"hal-lyu",cat:"역사",
+ def:"The global spread of Korean popular culture — K-pop, K-dramas, Korean food, beauty, and film — particularly explosive from the 2010s onward.",
+ date:"Late 1990s – present",why:"한류 is why the world suddenly knows Korea. For Korean Americans, it's the moment the culture they grew up with became globally cool."},
+
+// ── 인물 FAMOUS KOREANS ──────────────────────
+{ko:"세종대왕",en:"King Sejong the Great",roman:"se-jong-dae-wang",cat:"인물",
+ def:"The fourth king of the Joseon dynasty — creator of Hangul, the Korean alphabet. Also advanced science, agriculture, and governance. One of Korea's most revered historical figures.",
+ date:"1397 – 1450",why:"세종대왕 is on the 10,000 won bill. His creation of Hangul is considered one of the most important acts in Korean history."},
+{ko:"이순신",en:"Admiral Yi Sun-sin",roman:"i-sun-sin",cat:"인물",
+ def:"Naval commander who defended Korea against Japanese invasions with brilliant strategy and the famous 거북선 (turtle ship). Never lost a battle.",
+ date:"1545 – 1598",why:"이순신 is Korea's greatest military hero — a symbol of brilliance, sacrifice, and national defense. His statue stands in central Seoul."},
+{ko:"유관순",en:"Yoo Gwan-sun — independence martyr",roman:"yu-gwan-sun",cat:"인물",
+ def:"A teenage activist who led the March First Movement protests in her hometown of Cheonan after the Seoul uprising. Arrested, tortured, and died in prison at age 17.",
+ date:"1902 – 1920",why:"유관순 is Korea's Joan of Arc — a symbol of courage, sacrifice, and the independence movement. Every Korean child learns her name."},
+{ko:"안중근",en:"Ahn Jung-geun — independence activist",roman:"an-jung-geun",cat:"인물",
+ def:"Independence activist who assassinated Japanese colonial administrator Itō Hirobumi in 1909. Executed by Japan at age 31. Considered a patriotic martyr in Korea.",
+ date:"1879 – 1910",why:"안중근 is one of Korea's most celebrated heroes of resistance — and a deeply controversial figure in Japan–Korea relations."},
+{ko:"김구",en:"Kim Gu — independence leader",roman:"gim-gu",cat:"인물",
+ def:"One of the most important leaders of the Korean independence movement, leading the Provisional Government of Korea in exile. Assassinated in 1949.",
+ date:"1876 – 1949",why:"김구 is revered as the moral conscience of the independence movement — someone who chose principle over political power."},
+{ko:"박정희",en:"Park Chung-hee — president (1963–1979)",roman:"bak-jeong-hui",cat:"인물",
+ def:"Military dictator turned president who led South Korea's rapid industrialization — the '한강의 기적.' Also suppressed democracy and human rights. A deeply contested figure.",
+ date:"1917 – 1979",why:"박정희 is inseparable from modern Korea's economic success and political trauma. Understanding him is essential to understanding Korean politics and its divisions."},
+{ko:"김대중",en:"Kim Dae-jung — president, Nobel Peace Prize",roman:"gim-dae-jung",cat:"인물",
+ def:"South Korea's first opposition president — a democracy activist who survived assassination attempts and imprisonment, then won the Nobel Peace Prize in 2000 for his 햇볕정책 (Sunshine Policy) toward North Korea.",
+ date:"1924 – 2009",why:"김대중 represents the triumph of Korean democracy — a man who the government tried to kill who became president and won the Nobel Prize."},
+{ko:"방탄소년단",en:"BTS — K-pop group",roman:"bang-tan-so-nyeon-dan",cat:"인물",
+ def:"The most globally successful K-pop group — seven-member boy band that became the first Korean act to top the US Billboard Hot 100 and perform at the UN General Assembly.",
+ date:"Debuted 2013",why:"BTS is the face of 한류's global peak. Their success means the world now pronounces Korean words correctly."},
+{ko:"봉준호",en:"Bong Joon-ho — filmmaker",roman:"bong-jun-ho",cat:"인물",
+ def:"Director of Parasite (기생충), which won the Academy Award for Best Picture in 2020 — the first non-English-language film to do so.",
+ date:"Born 1969",why:"봉준호 made Hollywood history and gave Korean cinema global recognition. His speech about subtitles was a cultural moment."},
+{ko:"손흥민",en:"Son Heung-min — footballer",roman:"son-heung-min",cat:"인물",
+ def:"South Korea's greatest footballer — plays for Tottenham Hotspur in the Premier League, former top scorer in the league. Considered the best Asian player in football history.",
+ date:"Born 1992",why:"손흥민 is a point of national pride across generations — even people who don't follow football know his name."},
+{ko:"김연아",en:"Kim Yuna — figure skater",roman:"gim-yeon-a",cat:"인물",
+ def:"Olympic gold medalist figure skater — considered one of the greatest of all time. Won gold at the 2010 Vancouver Olympics and silver at 2014 Sochi.",
+ date:"Born 1990",why:"김연아 is one of the most beloved figures in Korean sports history — her 2010 Olympic performance is considered culturally iconic."},
+{ko:"이병철",en:"Lee Byung-chul — Samsung founder",roman:"i-byeong-cheol",cat:"인물",
+ def:"Founder of Samsung — starting from a small trading company in 1938 and building it into one of the world's largest conglomerates.",
+ date:"1910 – 1987",why:"이병철 represents the entrepreneurial vision behind Korea's economic miracle — and the complex legacy of the 재벌 system."},
+{ko:"정주영",en:"Chung Ju-yung — Hyundai founder",roman:"jeong-ju-yeong",cat:"인물",
+ def:"Founder of the Hyundai Group — built from nothing into one of Korea's largest conglomerates, including cars, construction, and shipbuilding.",
+ date:"1915 – 2001",why:"정주영 is a symbol of Korean industrial ambition — his autobiography is one of the most widely-read business books in Korea."},
+{ko:"허준",en:"Heo Jun — royal physician",roman:"heo-jun",cat:"인물",
+ def:"Joseon-era royal physician who compiled 동의보감 (Dongui Bogam) — an encyclopedic work on Korean medicine that is still referenced today.",
+ date:"1539 – 1615",why:"허준 codified Korean traditional medicine. 동의보감 was designated a UNESCO Memory of the World document in 2009."},
+{ko:"신사임당",en:"Shin Saimdang — artist and mother",roman:"sin-sa-im-dang",cat:"인물",
+ def:"A renowned artist, poet, and calligrapher of the Joseon era — and mother of the scholar 이이 (Yulgok). One of Korea's most celebrated women in history.",
+ date:"1504 – 1551",why:"신사임당 is on the 50,000 won bill — the highest denomination note. She represents the ideal of the educated, creative Korean woman."},
+
+// ── 지리 KOREAN GEOGRAPHY ──────────────────────
+{ko:"한반도",en:"Korean Peninsula",roman:"han-ban-do",cat:"지리",
+ def:"The peninsula shared by North and South Korea, jutting south from Manchuria into the sea between China and Japan.",
+ date:"Geographical",why:"한반도 is the term Koreans use when referring to all of Korea — North and South together — a reminder that the division is seen as temporary."},
+{ko:"서울",en:"Seoul — capital of South Korea",roman:"seo-ul",cat:"지리",
+ def:"Capital and largest city of South Korea, home to nearly half the country's population in the greater metropolitan area. One of the world's great megacities.",
+ date:"Capital since the Joseon dynasty (1394)",why:"서울 is where most Korean culture, media, and industry is centered — the city Korean Americans imagine when they think of Korea."},
+{ko:"부산",en:"Busan — second largest city",roman:"bu-san",cat:"지리",
+ def:"South Korea's second largest city — a major port city on the southeastern coast, known for beaches, seafood, and film (site of the Busan International Film Festival).",
+ date:"Major city since the Joseon era",why:"부산 is where many Korean families have roots, and a very different cultural vibe from Seoul."},
+{ko:"인천",en:"Incheon — port city and airport hub",roman:"in-cheon",cat:"지리",
+ def:"Major port city just west of Seoul — home to Incheon International Airport, the gateway for most Korean Americans traveling to Korea.",
+ date:"Major port since late 19th century",why:"If you've been to Korea, you've landed at 인천 공항 — widely considered one of the world's best airports."},
+{ko:"제주도",en:"Jeju Island",roman:"je-ju-do",cat:"지리",
+ def:"Volcanic island off the southern coast — Korea's largest island and top domestic tourist destination. Known for 한라산, haenyeo (women divers), and tangerines.",
+ date:"Part of Korea since the Goryeo dynasty",why:"제주도 is Korea's Hawaii — the island every Korean family dreams of visiting, and a UNESCO World Natural Heritage site."},
+{ko:"한라산",en:"Hallasan — Jeju's volcanic peak",roman:"hal-la-san",cat:"지리",
+ def:"The highest peak in South Korea at 1,950m — a shield volcano and the centerpiece of Jeju Island. Designated a UNESCO Biosphere Reserve.",
+ date:"Geological — formed 2 million years ago",why:"한라산 is iconic in Korean natural landscape imagery. Hiking it is a rite of passage for many Koreans."},
+{ko:"한강",en:"Han River",roman:"han-gang",cat:"지리",
+ def:"The river that flows through Seoul — historically the lifeblood of the Korean peninsula, now a beloved urban park and gathering space.",
+ date:"Central to Korean civilization throughout history",why:"한강 parks are where Koreans relax, eat 치킨, and socialize. '한강의 기적' (Miracle on the Han River) also takes its name from here."},
+{ko:"경복궁",en:"Gyeongbokgung Palace",roman:"gyeong-bok-gung",cat:"지리",
+ def:"The main royal palace of the Joseon dynasty — located in central Seoul. Burned by Japan during colonial rule, now largely restored.",
+ date:"Built 1395, destroyed/restored multiple times",why:"경복궁 is the symbol of Korean royal heritage and a must-visit destination. Seeing it damaged and restored is part of understanding Korean history."},
+{ko:"판문점",en:"Panmunjom — truce village",roman:"pan-mun-jeom",cat:"지리",
+ def:"The village on the DMZ where the Korean War armistice was signed in 1953. Site of historic inter-Korean summits.",
+ date:"Armistice signed July 27, 1953",why:"판문점 is the physical place where Korea's division is most visible — and where hope for reunification is most dramatically staged."},
+{ko:"비무장지대",en:"DMZ — Demilitarized Zone",roman:"bi-mu-jang-ji-dae",cat:"지리",
+ def:"The 4km-wide, 250km-long buffer zone between North and South Korea. One of the most heavily militarized borders in the world — and paradoxically, one of the best-preserved nature reserves.",
+ date:"Established 1953",why:"The DMZ is a place of tragedy, tension, and unexpected beauty — and a physical reminder of 분단 that Korean Americans who visit never forget."},
+{ko:"경주",en:"Gyeongju — ancient capital",roman:"gyeong-ju",cat:"지리",
+ def:"Historic city in North Gyeongsang Province — capital of the Silla kingdom for nearly 1,000 years. Called the 'museum without walls' for its abundance of ancient sites.",
+ date:"Silla capital: 57 BCE – 935 CE",why:"경주 is where Korean history feels most tangible — burial mounds, temples, and artifacts at every turn."},
+{ko:"평양",en:"Pyongyang — capital of North Korea",roman:"pyeong-yang",cat:"지리",
+ def:"Capital of North Korea — a city that is home to millions of Koreans who are part of the same people and history as South Koreans, yet almost completely inaccessible.",
+ date:"Ancient city; North Korean capital since 1948",why:"평양 is a place most Korean Americans will never visit but whose existence is always present in Korean consciousness."},
+{ko:"독도",en:"Dokdo — disputed islets",roman:"dok-do",cat:"지리",
+ def:"Small rocky islets in the East Sea, administered by South Korea but claimed by Japan. A fiercely emotional territorial dispute tied to colonial history.",
+ date:"Claimed by Korea since the Silla era; dispute intensified post-1945",why:"독도 is one of the most emotionally charged topics in Korean national identity — bringing up Japan's claim is not a neutral act."},
+{ko:"동해",en:"East Sea (Sea of Japan controversy)",roman:"dong-hae",cat:"지리",
+ def:"The body of water between Korea and Japan — Koreans call it 동해 (East Sea), Japan calls it the Sea of Japan. An ongoing naming dispute tied to colonial-era politics.",
+ date:"Dispute began post-Japanese colonial era",why:"Korean Americans sometimes encounter this controversy when maps use 'Sea of Japan' — knowing 동해 and its significance matters."},
+{ko:"백두산",en:"Baekdusan — sacred mountain",roman:"baek-du-san",cat:"지리",
+ def:"The highest peak on the Korean peninsula (2,744m), located on the China–North Korea border. A sacred mountain in Korean mythology — the birthplace of the nation according to legend.",
+ date:"Mythologically: where 단군 was born",why:"백두산 appears in Korea's national anthem and represents the spiritual and mythological north of the Korean homeland."},
+{ko:"강원도",en:"Gangwon Province",roman:"gang-won-do",cat:"지리",
+ def:"Province in northeastern South Korea — home to mountains, ski resorts, and the 2018 Pyeongchang Winter Olympics.",
+ date:"Province since the Joseon era",why:"강원도 is where Koreans go to ski and hike — and where many Korean Americans experienced the 2018 Olympics with pride."},
+{ko:"전라도",en:"Jeolla Province",roman:"jeol-la-do",cat:"지리",
+ def:"The southwestern region of Korea — known as the heartland of Korean cuisine and agricultural tradition. A region with a distinct identity and history of political marginalization.",
+ date:"Historical province since the Goryeo era",why:"전라도's cuisine — especially 전주 비빔밥 — is considered the finest in Korea. The region's history also includes the 5·18 Gwangju Uprising."},
+{ko:"경상도",en:"Gyeongsang Province",roman:"gyeong-sang-do",cat:"지리",
+ def:"The southeastern region of Korea — historically powerful, home to Busan and Gyeongju. Its dialect is notably distinct.",
+ date:"Historical province since the Goryeo era",why:"Regional differences between 전라도 and 경상도 have shaped Korean politics for decades — understanding this helps decode Korean regional identity."},
+{ko:"인사동",en:"Insadong — cultural district in Seoul",roman:"in-sa-dong",cat:"지리",
+ def:"A neighborhood in central Seoul known for traditional arts, tea houses, galleries, and craft shops — a center of traditional Korean culture within the modern city.",
+ date:"Cultural district established in the 20th century",why:"인사동 is where Korean Americans often go to feel close to traditional culture when visiting Seoul."},
+{ko:"이태원",en:"Itaewon — international district in Seoul",roman:"i-tae-won",cat:"지리",
+ def:"A neighborhood in Seoul historically associated with US military presence, now a diverse international district with global food, fashion, and nightlife. Site of the 2022 Halloween tragedy.",
+ date:"International district character developed post-1945",why:"이태원 is where many Korean Americans feel most at home in Seoul — and where the 2022 crowd crush shocked the diaspora."},
+
+// ── 감정 EMOTIONS & UNTRANSLATABLE WORDS ──────────────────────
+{ko:"한",en:"han — grief, resentment, longing",roman:"han",cat:"감정",
+ def:"An untranslatable emotional concept — a deep, collective feeling of sorrow, resentment, grief, and longing that is woven into Korean cultural identity. Born from centuries of suffering and injustice.",
+ date:"Deeply rooted in Korean cultural history",why:"한 is often cited as the defining emotion of the Korean people — it explains a depth of feeling in Korean art, music, and relationships that can't be reduced to sadness."},
+{ko:"정",en:"jeong — deep emotional bond",roman:"jeong",cat:"감정",
+ def:"A deep, accumulated bond of affection and attachment between people — not quite love, not friendship, but something that builds over time through shared meals, hardship, and presence.",
+ date:"Traditional",why:"정 is why Korean relationships feel so intense. 'I have 정 with you' means something almost impossible to express in English."},
+{ko:"눈치",en:"noonchi — social awareness",roman:"nun-chi",cat:"감정",
+ def:"The ability to read unspoken social cues and atmosphere — knowing what someone needs, how they feel, and what's happening in a room without being told.",
+ date:"Traditional",why:"High 눈치 is one of the most valued social skills in Korean culture. Low 눈치 is a real criticism."},
+{ko:"체면",en:"chemyeon — face / social dignity",roman:"che-myeon",cat:"감정",
+ def:"The concept of social face — one's dignity, reputation, and the perception others have of you. Protecting 체면 (one's own and others') governs much of Korean social behavior.",
+ date:"Traditional — influenced by Confucian values",why:"Much of Korean social behavior that confuses Westerners — indirect communication, not saying no directly — can be explained by 체면."},
+{ko:"눈치채다",en:"to read the room / to pick up on cues",roman:"nun-chi-chae-da",cat:"감정",
+ def:"To sense what's happening emotionally or socially without being told. The verb form of 눈치.",
+ date:"Traditional",why:"Knowing this verb helps you talk about social perception in Korean in a nuanced way."},
+{ko:"서운하다",en:"to feel let down / hurt by someone's absence of care",roman:"seo-un-ha-da",cat:"감정",
+ def:"A feeling of hurt, disappointment, and longing — specifically when someone you care about fails to consider your feelings or doesn't show up emotionally. Not quite sad, not quite hurt.",
+ date:"Traditional",why:"서운하다 fills an emotional gap that English doesn't have. Korean Americans who grow up hearing this from parents often feel it without having the word."},
+{ko:"억울하다",en:"to feel wrongly accused / unjustly treated",roman:"eok-ul-ha-da",cat:"감정",
+ def:"The feeling of being wronged, misunderstood, or unjustly treated — with a sense of helplessness and frustration that the injustice can't be corrected.",
+ date:"Traditional",why:"억울하다 is one of the most expressive Korean emotional words — and one Korean Americans encounter in family contexts when conflicts aren't fully resolved."},
+{ko:"그립다",en:"to miss / to yearn for",roman:"geu-rip-da",cat:"감정",
+ def:"To miss someone or something with a deep, aching longing. More poetic and profound than simply '보고 싶다' (I want to see you).",
+ date:"Traditional",why:"그립다 carries a weight of nostalgia and longing that resonates deeply for Korean Americans missing Korea or their grandparents."},
+{ko:"외롭다",en:"to be lonely",roman:"oe-rop-da",cat:"감정",
+ def:"To be lonely — a feeling that appears frequently in Korean poetry, song lyrics, and everyday speech.",
+ date:"Traditional",why:"Understanding this word unlocks a huge amount of Korean music and poetry, which returns to 외로움 (loneliness) constantly."},
+{ko:"설레다",en:"to feel a flutter of excitement / anticipation",roman:"seol-le-da",cat:"감정",
+ def:"The feeling of excited anticipation — a light, fluttery feeling in the chest before something wonderful. Used for first love, a trip, a new beginning.",
+ date:"Traditional",why:"설레다 captures a positive emotional texture that English can only describe in phrases. It's everywhere in Korean pop culture."},
+{ko:"뿌듯하다",en:"to feel proud and satisfied",roman:"ppu-deut-ha-da",cat:"감정",
+ def:"A warm, swelling feeling of pride and satisfaction — when you've done something well or when someone you love succeeds.",
+ date:"Traditional",why:"This is the feeling Korean parents have when their kids do well. Hearing a parent say '뿌듯해' is one of the most meaningful things in Korean family life."},
+{ko:"아쉽다",en:"to feel regret / to be a shame",roman:"a-swip-da",cat:"감정",
+ def:"A mild feeling of regret or disappointment — something fell short of what you hoped, or an opportunity was missed. Gentler than 후회 (deep regret).",
+ date:"Traditional",why:"아쉽다 is a core word in Korean emotional vocabulary — used constantly in daily conversation."},
+{ko:"답답하다",en:"to feel frustrated / stifled / suffocated",roman:"dap-dap-ha-da",cat:"감정",
+ def:"A feeling of frustration, pressure, or emotional suffocation — like something is pressing on your chest. Used for situations where communication fails or things are stuck.",
+ date:"Traditional",why:"답답하다 describes a specific kind of Korean frustration that doesn't translate cleanly. Parents use it when they can't get through to their kids."},
+{ko:"후련하다",en:"to feel relieved / unburdened",roman:"hu-ryeon-ha-da",cat:"감정",
+ def:"The feeling of relief when a burden has been lifted — a release of tension, like finally exhaling after holding your breath.",
+ date:"Traditional",why:"후련하다 pairs naturally with 답답하다 — the release after the stifling feeling."},
+{ko:"멋쩍다",en:"to feel awkward / sheepish",roman:"meot-jjeok-da",cat:"감정",
+ def:"To feel awkward, self-conscious, or sheepish — when you don't know what to do with yourself in a social moment.",
+ date:"Traditional",why:"멋쩍다 describes the universal social awkwardness that Korean Americans feel in Korean family situations they don't fully navigate — there's a word for it."},
+
+// ── 육아 RAISING KIDS IN KOREAN ──────────────────────
+{ko:"이게 뭐야?",en:"What is this?",roman:"i-ge mwo-ya?",cat:"육아",
+ def:"The fundamental question for teaching a child vocabulary — point at something and ask '이게 뭐야?'",
+ date:"Conversational",why:"This is the single most useful teaching phrase for Korean American parents who want to raise bilingual children."},
+{ko:"잘했어",en:"well done / good job",roman:"jal-hae-sseo",cat:"육아",
+ def:"'You did well' — the everyday praise Korean parents give children. Simple, warm, direct.",
+ date:"Conversational",why:"Children need to hear this in Korean for it to feel real. English 'good job' and Korean 잘했어 carry different emotional weight."},
+{ko:"안 돼",en:"no / not allowed",roman:"an-dwae",cat:"육아",
+ def:"'It doesn't work / you can't' — the standard Korean way to say no to a child. More nuanced than just '아니요.'",
+ date:"Conversational",why:"Parents who can't say no in Korean lose an important natural boundary-setting tool."},
+{ko:"조심해",en:"be careful",roman:"jo-sim-hae",cat:"육아",
+ def:"Be careful — said constantly to children. One of the most-used parenting words.",
+ date:"Conversational",why:"A single word that covers a huge range of protective parenting moments."},
+{ko:"밥 먹자",en:"let's eat",roman:"bap meok-ja",cat:"육아",
+ def:"'Let's eat' — one of the most common phrases in a Korean household, said multiple times a day.",
+ date:"Conversational",why:"Raising kids with Korean means making 밥 먹자 as automatic as 'time to eat.'"},
+{ko:"씻어",en:"wash up / go wash",roman:"ssi-sseo",cat:"육아",
+ def:"'Wash' — used to tell a child to wash their hands or go bathe.",
+ date:"Conversational",why:"Simple command, used constantly. Kids who hear this in Korean will understand Korean commands better."},
+{ko:"자야지",en:"time to sleep",roman:"ja-ya-ji",cat:"육아",
+ def:"'You should sleep' / 'time to sleep' — a gentle, slightly coaxing bedtime phrase.",
+ date:"Conversational",why:"Bedtime in Korean creates a ritual association with the language that children carry for life."},
+{ko:"사랑해",en:"I love you",roman:"sa-rang-hae",cat:"육아",
+ def:"I love you — Korean parents historically express love more through action (food, sacrifice) than words, but the phrase is increasingly used with children.",
+ date:"Traditional / Modern",why:"Korean American parents often say this more freely than their own parents did — a beautiful generational shift."},
+{ko:"착해",en:"you're good / you're kind",roman:"cha-kae",cat:"육아",
+ def:"'You're good, kind, well-behaved' — a term of endearment and praise said to children.",
+ date:"Conversational",why:"This word bundles kindness and goodness together — a distinctly Korean way of praising character over achievement."},
+{ko:"이리 와",en:"come here",roman:"i-ri-wa",cat:"육아",
+ def:"'Come here' — a fundamental phrase for getting a child's attention.",
+ date:"Conversational",why:"Short, clear commands in Korean help children respond naturally to the language."},
+{ko:"천천히",en:"slowly / take your time",roman:"cheon-cheon-hi",cat:"육아",
+ def:"'Slowly' — used to tell a child to slow down, eat slowly, or not rush.",
+ date:"Conversational",why:"A word that teaches patience and pace — deeply needed in the rush of modern parenting."},
+{ko:"같이 해보자",en:"let's try it together",roman:"ga-chi hae-bo-ja",cat:"육아",
+ def:"'Let's try it together' — an invitation to do something as a team, great for teaching and encouraging.",
+ date:"Conversational",why:"Collaborative learning phrases in Korean create bilingual habits naturally."},
+{ko:"잠깐만",en:"just a moment / wait a second",roman:"jam-kkan-man",cat:"육아",
+ def:"'Just a moment' — one of the most-used phrases in parenting and daily life.",
+ date:"Conversational",why:"Children who grow up hearing this understand Korean requests naturally."},
+{ko:"우리 아기",en:"my baby / our baby",roman:"u-ri a-gi",cat:"육아",
+ def:"'Our baby' — a term of endearment for a young child. '우리' (our) is used in Korean where English uses 'my,' reflecting the collective nature of Korean identity.",
+ date:"Conversational",why:"The '우리' instead of '나의' is a distinctly Korean linguistic habit — teaching children 우리 language patterns builds authentic Korean."},
+{ko:"한국어로 말해봐",en:"try saying it in Korean",roman:"han-gu-geo-ro mal-hae-bwa",cat:"육아",
+ def:"'Try saying it in Korean' — an essential phrase for parents encouraging bilingual children.",
+ date:"Conversational",why:"This phrase is the engine of language maintenance — gently redirecting children to Korean without pressure."},
+
+// ── 격식 FORMAL KOREAN & HANJA ──────────────────────
+{ko:"민주주의",en:"democracy",roman:"min-ju-ju-ui",cat:"격식",
+ def:"Democracy — a Hanja-based word (民主主義) that appears constantly in news, political speech, and historical discussion.",
+ date:"Modern political vocabulary",why:"Heritage speakers often understand the concept but don't know the Korean word — this is the formal vocabulary gap."},
+{ko:"경제",en:"economy",roman:"gyeong-je",cat:"격식",
+ def:"Economy — another Hanja compound (經濟) that appears in every Korean news broadcast.",
+ date:"Modern",why:"Knowing formal economic and political vocabulary is what separates 'home Korean' from news-literate Korean."},
+{ko:"사회",en:"society",roman:"sa-hoe",cat:"격식",
+ def:"Society — a Hanja word (社會) used in formal contexts: 사회 문제 (social issues), 사회학 (sociology).",
+ date:"Modern",why:"This word unlocks a huge range of formal Korean discussion topics."},
+{ko:"문화",en:"culture",roman:"mun-hwa",cat:"격식",
+ def:"Culture — Hanja compound (文化). Used in both formal and everyday contexts: 한국 문화, 문화재 (cultural heritage).",
+ date:"Modern",why:"Understanding 문화 in formal contexts helps Korean Americans engage with news and academic discussions about Korea."},
+{ko:"역사",en:"history",roman:"yeok-sa",cat:"격식",
+ def:"History — Hanja compound (歷史). The formal word for history, used in school, media, and official contexts.",
+ date:"Modern",why:"Heritage speakers often know Korean history emotionally but not the vocabulary to discuss it formally."},
+{ko:"국가",en:"nation / state",roman:"guk-ga",cat:"격식",
+ def:"Nation or state — Hanja compound (國家). More formal than 나라 (the everyday word for country).",
+ date:"Modern",why:"Knowing when to use 국가 vs 나라 is a marker of formal Korean literacy."},
+{ko:"정부",en:"government",roman:"jeong-bu",cat:"격식",
+ def:"Government — Hanja compound (政府). Used in news, political discussion, and formal writing.",
+ date:"Modern",why:"A foundational word for following Korean news or political discussions."},
+{ko:"법률",en:"law / legislation",roman:"beom-nyul",cat:"격식",
+ def:"Law or legislation — formal Hanja compound (法律). More formal than 법 alone.",
+ date:"Modern",why:"This level of vocabulary is needed to follow Korean legal or political news accurately."},
+{ko:"교육",en:"education",roman:"gyo-yuk",cat:"격식",
+ def:"Education — Hanja compound (敎育). One of the most important topics in Korean society and Korean American family life.",
+ date:"Modern",why:"교육 is arguably the central preoccupation of Korean American family culture — knowing the word formally is essential."},
+{ko:"의료",en:"medical care / healthcare",roman:"ui-ryo",cat:"격식",
+ def:"Medical care or healthcare — Hanja compound (醫療). Used in formal contexts about health systems and policy.",
+ date:"Modern",why:"Knowing formal health vocabulary helps Korean Americans navigate conversations with Korean-speaking parents about health and aging."},
+{ko:"환경",en:"environment",roman:"hwan-gyeong",cat:"격식",
+ def:"Environment — Hanja compound (環境). Used in both environmental science and everyday contexts.",
+ date:"Modern",why:"환경 problems — air pollution (미세먼지) in particular — are a major topic in modern Korea."},
+{ko:"평화",en:"peace",roman:"pyeong-hwa",cat:"격식",
+ def:"Peace — Hanja compound (平和). A deeply meaningful word given Korean history — '한반도 평화' (peace on the Korean peninsula) is a phrase with enormous weight.",
+ date:"Modern",why:"평화 is not an abstract concept in Korea — it's a political and emotional reality."},
+{ko:"통일",en:"reunification",roman:"tong-il",cat:"격식",
+ def:"Reunification of North and South Korea — one of the defining political aspirations of Korean national consciousness.",
+ date:"Modern — post-1945 aspiration",why:"통일 is in Korea's national anthem, school curricula, and the dreams of 이산가족. Understanding this word is understanding Korean longing."},
+{ko:"미래",en:"future",roman:"mi-rae",cat:"격식",
+ def:"Future — Hanja compound (未來). Used formally in speeches, news, and vision statements.",
+ date:"Modern",why:"A word that appears in every graduation speech, political vision, and discussion of where Korea is headed."},
+{ko:"연구",en:"research",roman:"yeon-gu",cat:"격식",
+ def:"Research — Hanja compound (硏究). Essential vocabulary for academic and professional Korean.",
+ date:"Modern",why:"For Korean Americans in academic or professional fields, this is foundational formal vocabulary."},
+
+// ── 대중문화 POP CULTURE & ARTS ──────────────────────
+{ko:"판소리",en:"pansori — traditional narrative singing",roman:"pan-so-ri",cat:"대중문화",
+ def:"A genre of Korean musical storytelling — one singer and one drummer performing dramatic narratives, often for hours. A UNESCO Intangible Cultural Heritage.",
+ date:"Developed during the Joseon dynasty (18th century)",why:"판소리 is the root of Korean musical expression — understanding it gives context to why Korean vocal music is so emotionally intense."},
+{ko:"사물놀이",en:"samulnori — Korean percussion ensemble",roman:"sa-mul-lo-ri",cat:"대중문화",
+ def:"Traditional percussion music performed by four musicians playing four instruments (꽹과리, 징, 장구, 북). Rooted in shamanistic and agricultural ritual.",
+ date:"Formalized as a performance genre in 1978",why:"사물놀이 rhythms underpin much of Korean music — you hear them in modern K-pop production."},
+{ko:"한복",en:"hanbok — traditional Korean clothing",roman:"han-bok",cat:"대중문화",
+ def:"Traditional Korean clothing — characterized by vibrant colors and flowing lines. Worn on holidays, at weddings, and for 돌잔치.",
+ date:"Developed during the Joseon dynasty",why:"한복 is experiencing a global cultural moment — younger Koreans are reclaiming it as fashion. Korean Americans increasingly wear it proudly."},
+{ko:"태권도",en:"taekwondo",roman:"tae-gwon-do",cat:"대중문화",
+ def:"Korean martial art — characterized by high kicks and fast striking. Olympic sport since 2000. One of the most widely practiced martial arts in the world.",
+ date:"Formalized in 1955; Olympic sport since 2000",why:"태권도 is often Korean Americans' first formal connection to Korean culture — and a point of pride globally."},
+{ko:"씨름",en:"ssireum — Korean wrestling",roman:"ssi-reum",cat:"대중문화",
+ def:"Traditional Korean wrestling — two competitors grab each other's cloth belt and attempt to throw the opponent to the ground.",
+ date:"Traditional — depicted in Goguryeo-era murals (3rd–5th century CE)",why:"씨름 is one of Korea's oldest sports traditions — and a recurring image in Korean historical paintings."},
+{ko:"K-드라마",en:"K-drama — Korean drama series",roman:"K-deu-ra-ma",cat:"대중문화",
+ def:"Korean television drama — a global phenomenon with distinct storytelling traditions: the slow burn romance, the revenge plot, the family melodrama.",
+ date:"Global phenomenon from the late 1990s; accelerated 2010s–present",why:"K-드라마 is often how Korean Americans reconnect with the language — watching with subtitles and gradually turning them off."},
+{ko:"K-팝",en:"K-pop — Korean pop music",roman:"K-pap",cat:"대중문화",
+ def:"Korean popular music — a global industry combining music, choreography, fashion, and parasocial fandom. Originated in the 1990s and exploded globally in the 2010s.",
+ date:"Modern industry origin: mid-1990s",why:"K-팝 is the reason the world now knows what Korea is — and a generational bridge for Korean American youth connecting with Korean culture."},
+{ko:"웹툰",en:"webtoon — Korean digital comic",roman:"web-tun",cat:"대중문화",
+ def:"Korean digital comics optimized for vertical mobile scrolling — a format pioneered in Korea that is now global. Many K-dramas are adapted from webtoons.",
+ date:"Early 2000s — pioneered by Naver and Daum",why:"웹툰 is a Korean cultural export that changed how comics are made worldwide. Korean Americans who love comics often don't realize the format is Korean."},
+{ko:"영화",en:"film / movie",roman:"yeong-hwa",cat:"대중문화",
+ def:"Film — Korean cinema has produced globally acclaimed works including 기생충 (Parasite), 올드보이 (Oldboy), and 버닝 (Burning).",
+ date:"Modern",why:"Korean cinema is having a golden era — knowing 영화 vocabulary helps Korean Americans engage with one of Korea's greatest cultural exports."},
+{ko:"민요",en:"folk song",roman:"min-yo",cat:"대중문화",
+ def:"Traditional Korean folk songs — passed down through generations, often tied to work, seasons, or regional identity. 아리랑 is the most famous.",
+ date:"Traditional",why:"민요 are the songs Korean grandparents remember from childhood — songs that carry the emotional memory of a place and time."},
+{ko:"아리랑",en:"Arirang — Korea's unofficial anthem",roman:"a-ri-rang",cat:"대중문화",
+ def:"Korea's most famous folk song — a lyrical expression of longing, separation, and hope. Versions exist across all Korean regions. UNESCO Intangible Cultural Heritage.",
+ date:"Origins debated; versions documented for centuries",why:"아리랑 is the song that makes Koreans cry. Every Korean American has heard it — knowing its name and meaning deepens the experience."},
+{ko:"풍물",en:"pungmul — traditional percussion and dance",roman:"pung-mul",cat:"대중문화",
+ def:"Traditional Korean communal music and dance featuring percussion, movement, and acrobatics — originally associated with farming rituals and festivals.",
+ date:"Traditional",why:"풍물 is the living heartbeat of traditional Korean community celebration — still performed at Korean American cultural events."},
+
+// ── 건강 HEALTH & BODY ──────────────────────
+{ko:"한의학",en:"traditional Korean medicine",roman:"han-ui-hak",cat:"건강",
+ def:"Traditional Korean medicine — incorporating herbal remedies, acupuncture, and holistic diagnosis. Practiced alongside Western medicine in Korea.",
+ date:"Formalized during the Joseon dynasty; 허준's 동의보감 (1613)",why:"Many Korean American families use both Western medicine and 한의학 — knowing the vocabulary bridges the two worlds."},
+{ko:"침",en:"acupuncture needle / acupuncture",roman:"chim",cat:"건강",
+ def:"Acupuncture — inserting fine needles into specific points to treat pain and illness. Widely practiced in Korean traditional medicine.",
+ date:"Traditional",why:"Korean grandparents often recommend 침 for everything. Knowing the word helps Korean Americans participate in these conversations."},
+{ko:"기",en:"qi / life energy",roman:"gi",cat:"건강",
+ def:"Life energy or vital force — the concept that animates traditional Korean (and East Asian) medicine. '기가 막혔어' (my 기 is blocked) is also a common expression for being speechless.",
+ date:"Traditional — rooted in Daoist and Buddhist philosophy",why:"기 underlies traditional health concepts AND appears in everyday Korean expressions — it's foundational vocabulary."},
+{ko:"몸보신",en:"body fortifying / restorative eating",roman:"mom-bo-sin",cat:"건강",
+ def:"The practice of eating specific foods to restore and fortify the body — especially after illness, childbirth, or exhaustion. 삼계탕 (ginseng chicken soup) is the classic 몸보신 dish.",
+ date:"Traditional",why:"'먹어야 몸보신이 돼' — 'you need to eat to restore your body' — is what every Korean grandmother says. Understanding 몸보신 explains a lot of Korean food culture."},
+{ko:"삼계탕",en:"ginseng chicken soup",roman:"sam-gye-tang",cat:"건강",
+ def:"A whole young chicken stuffed with glutinous rice, ginseng, garlic, and jujubes, simmered in broth. Eaten especially in summer to restore energy.",
+ date:"Traditional",why:"삼계탕 is what Korean families make when someone is sick or exhausted — the food version of saying 'I love you.'"},
+{ko:"건강",en:"health",roman:"geon-gang",cat:"건강",
+ def:"Health — one of the most common topics in Korean family conversation, especially among older Koreans.",
+ date:"Modern",why:"'건강해야 해' (you need to be healthy) is one of the most Korean things a parent can say — it carries immense love."},
+{ko:"약",en:"medicine",roman:"yak",cat:"건강",
+ def:"Medicine or medication. Korean families often have elaborate home pharmacies.",
+ date:"Traditional",why:"Knowing 약 vocabulary helps Korean Americans communicate about health with Korean-speaking family members."},
+{ko:"두통",en:"headache",roman:"du-tong",cat:"건강",
+ def:"Headache — Hanja compound (頭痛). A common complaint and starting point for discussing symptoms.",
+ date:"Modern",why:"Body symptom vocabulary is essential for Korean Americans navigating healthcare conversations with Korean-speaking family."},
+{ko:"우울증",en:"depression",roman:"u-ul-jeung",cat:"건강",
+ def:"Clinical depression — a term that carries significant stigma in Korean culture. Mental health awareness is growing but the word itself can be hard to say.",
+ date:"Modern clinical vocabulary",why:"Korean American communities have high rates of depression and anxiety — knowing the vocabulary helps break the silence around mental health."},
+{ko:"스트레스",en:"stress",roman:"seu-teu-re-seu",cat:"건강",
+ def:"Stress — a loanword from English. One of the most commonly used health-related words in modern Korean.",
+ date:"Modern — loanword",why:"'스트레스 받아' (I'm stressed) is one of the most universal Korean American experiences — and one of the first sentences people learn to say in Korean."},
+{ko:"화병",en:"hwabyeong — suppressed anger illness",roman:"hwa-byeong",cat:"건강",
+ def:"A culture-bound syndrome recognized in the DSM — literally 'fire illness.' Caused by suppressing anger, grief, or injustice over long periods. Symptoms include a burning sensation in the chest.",
+ date:"Recognized clinically in the 20th century; roots in Korean culture",why:"화병 is a uniquely Korean mental health concept that captures what happens to first-generation immigrants who endure hardship silently. Korean Americans are at higher risk."},
+{ko:"명상",en:"meditation",roman:"myeong-sang",cat:"건강",
+ def:"Meditation — increasingly common in Korean wellness culture, blending Buddhist tradition with modern mindfulness.",
+ date:"Traditional Buddhist roots; modern revival",why:"명상 vocabulary bridges Korean American interest in wellness with traditional Korean spiritual practice."},
+
+// ── 사회 SOCIETY & CURRENT KOREA ──────────────────────
+{ko:"빨리빨리",en:"hurry hurry / fast-paced culture",roman:"ppal-li-ppal-li",cat:"사회",
+ def:"Literally 'quickly quickly' — describes the Korean cultural tendency toward urgency, speed, and impatience. Both a strength (economic miracle) and a source of stress.",
+ date:"Modern — associated with Korea's rapid industrialization",why:"빨리빨리 culture explains why Korean internet is the fastest in the world, why Korean food delivery takes 15 minutes, and why Korean work culture can be brutal."},
+{ko:"눈치 없다",en:"to lack social awareness",roman:"nun-chi eop-da",cat:"사회",
+ def:"To lack 눈치 — to miss obvious social cues. A pointed social criticism in Korean culture where reading the room is a critical skill.",
+ date:"Traditional",why:"Being told you have 눈치 없다 is one of the more stinging Korean social criticisms — understanding it helps navigate Korean social environments."},
+{ko:"재벌",en:"chaebol — Korean conglomerate",roman:"jae-beol",cat:"사회",
+ def:"Large family-owned business conglomerates that dominate the Korean economy — Samsung, Hyundai, LG, SK, Lotte. Incredibly powerful, politically connected, and controversial.",
+ date:"Emerged during Korea's industrialization (1960s–70s)",why:"재벌 shape everything in Korea — employment, politics, media, and culture. Understanding the word is understanding Korean economic power."},
+{ko:"취업난",en:"employment difficulty / job shortage crisis",roman:"chwi-eop-nan",cat:"사회",
+ def:"The difficult job market facing young Koreans — intense competition for limited positions at desirable companies, driving extreme exam preparation and burnout.",
+ date:"Modern — intensified since the 2000s",why:"취업난 is one of the defining social crises of younger Koreans and is directly related to the education pressure Korean American families also feel."},
+{ko:"워라밸",en:"work-life balance",roman:"wo-ra-bael",cat:"사회",
+ def:"Work-life balance — a portmanteau of the English words, reflecting a growing desire among younger Koreans to push back against 빨리빨리 and overwork culture.",
+ date:"Modern term — emerged in the 2010s",why:"워라밸 represents a generational shift in Korea that Korean Americans often see in their Korean peers — a move away from total work devotion."},
+{ko:"헬조선",en:"hell Joseon — dark critique of Korean society",roman:"hel-jo-seon",cat:"사회",
+ def:"A satirical term combining '헬' (hell) with '조선' (old Korea) — expressing younger Koreans' despair at a society they see as rigid, unfair, and suffocating.",
+ date:"Emerged c. 2015",why:"헬조선 captures the frustration of a generation that worked incredibly hard and still can't afford housing or find decent work. Understanding it is understanding modern Korean youth."},
+{ko:"금수저",en:"gold spoon — born into privilege",roman:"geum-su-jeo",cat:"사회",
+ def:"'Gold spoon' — born into wealth and privilege. Part of a spoon class system (금수저, 은수저, 흙수저) that satirizes Korean social mobility — or the lack thereof.",
+ date:"Modern — emerged c. 2015",why:"흙수저 (dirt spoon) vs 금수저 captures the class anxiety of modern Korea in a way that resonates with Korean Americans thinking about family wealth and opportunity."},
+{ko:"미세먼지",en:"fine dust / air pollution",roman:"mi-se-meon-ji",cat:"사회",
+ def:"Fine particulate matter (PM2.5) — a major environmental problem in Korea, partly from Chinese industrial pollution and domestic traffic. A daily topic in Korean life.",
+ date:"Ongoing environmental issue — intensified 2000s–present",why:"When Korean family members talk about Korea, 미세먼지 comes up constantly. It's shaped daily behavior — masks were normal in Korea long before COVID."},
+{ko:"부동산",en:"real estate",roman:"bu-dong-san",cat:"사회",
+ def:"Real estate — one of the most obsessive topics in Korean social conversation. Housing prices in Seoul have become a major source of social anxiety and political tension.",
+ date:"Modern",why:"'부동산 어때?' (how's real estate?) is something Korean adults say instead of talking about feelings. It's a proxy for life stability."},
+{ko:"전세",en:"jeonse — lump-sum deposit rental system",roman:"jeon-se",cat:"사회",
+ def:"A uniquely Korean rental system where a tenant pays a large lump-sum deposit (instead of monthly rent) that is returned at the end of the lease. The landlord invests the money.",
+ date:"Unique to Korea — system developed in the 20th century",why:"전세 is one of the most distinctly Korean social inventions — and understanding it helps Korean Americans understand housing conversations."},
+{ko:"성평등",en:"gender equality",roman:"seong-pyeong-deung",cat:"사회",
+ def:"Gender equality — a major topic of social debate in Korea, where significant generational and political divisions exist around gender roles and rights.",
+ date:"Modern social movement vocabulary",why:"성평등 debates are reshaping Korean society — and Korean Americans who follow Korean news encounter this vocabulary constantly."},
+{ko:"다문화",en:"multicultural",roman:"da-mun-hwa",cat:"사회",
+ def:"Multicultural — describes the growing diversity in Korea through immigration and international marriage. A relatively new social reality for a historically homogeneous society.",
+ date:"Emerging social category — accelerated 2000s–present",why:"다문화 families in Korea navigate similar identity questions to Korean Americans — the word is increasingly important as Korea changes."},
+
+// ── 명절 HOLIDAYS & RITUALS ──────────────────────
+{ko:"설날",en:"Seollal — Lunar New Year",roman:"seol-lal",cat:"명절",
+ def:"Korean Lunar New Year — the most important traditional holiday. Families gather, perform 차례, wear 한복, eat 떡국, and offer 세배 (bowing) to elders who give 세뱃돈 (cash).",
+ date:"First day of the lunar calendar — typically late January to mid-February",why:"설날 is the holiday Korean Americans feel most Korean. The rituals, the food, the intergenerational gathering — it's the anchor of cultural identity."},
+{ko:"추석",en:"Chuseok — Korean harvest festival",roman:"chu-seok",cat:"명절",
+ def:"Korea's harvest thanksgiving holiday — second only to 설날 in importance. Families gather, perform 차례, visit ancestral graves, eat 송편 (rice cakes), and celebrate the full moon.",
+ date:"15th day of the 8th lunar month — typically September",why:"추석 is when Korea essentially pauses — highways are jammed, everyone goes home. For Korean Americans, it's often when family feels most present even in absence."},
+{ko:"세배",en:"sebae — New Year's bow",roman:"se-bae",cat:"명절",
+ def:"A deep, formal bow performed by younger family members to elders on 설날. Accompanied by a formal New Year's greeting and followed by 세뱃돈 (cash gifts from elders).",
+ date:"Traditional — Joseon era",why:"세배 is the moment in Korean New Year when generational respect is most physically expressed. Many Korean American children did this without knowing the word."},
+{ko:"세뱃돈",en:"New Year's money gift from elders",roman:"se-baet-don",cat:"명절",
+ def:"Cash given by elders to younger family members after 세배 on 설날. The most beloved tradition for Korean American children at Lunar New Year.",
+ date:"Traditional",why:"Every Korean American child who grew up doing 설날 remembers 세뱃돈. Knowing the word names a beloved memory."},
+{ko:"떡국",en:"rice cake soup eaten on New Year's",roman:"tteok-guk",cat:"명절",
+ def:"Soup made with sliced oval rice cakes (가래떡) in a clear broth. Eating 떡국 on 설날 is how you turn a year older in Korean tradition.",
+ date:"Traditional",why:"'떡국 먹었어?' (Have you had 떡국?) on New Year's Day is how Koreans greet each other — a cultural ritual expressed through food."},
+{ko:"송편",en:"songpyeon — Chuseok rice cakes",roman:"song-pyeon",cat:"명절",
+ def:"Half-moon shaped rice cakes filled with sesame, red bean, or chestnut, steamed on pine needles. Made and eaten during 추석.",
+ date:"Traditional — associated with 추석 for centuries",why:"Making 송편 together as a family is a bonding ritual — and there's a saying that if you make it well, your children will be beautiful."},
+{ko:"돌잔치",en:"dol — first birthday celebration",roman:"dol-jan-chi",cat:"명절",
+ def:"Elaborate celebration of a baby's first birthday — featuring 돌잡이, where the baby grabs objects that predict their future (thread = long life, money = wealth, pencil = scholarship).",
+ date:"Traditional — Joseon era; first birthdays were celebrated because infant mortality was high",why:"돌잔치 is one of the most visually elaborate Korean celebrations — and a moment of genuine cultural meaning for Korean American families."},
+{ko:"돌잡이",en:"doljabi — object-grabbing prediction ritual",roman:"dol-ja-bi",cat:"명절",
+ def:"The ritual within 돌잔치 where a baby reaches for objects laid out on a table, each symbolizing a future path.",
+ date:"Traditional",why:"돌잡이 is a beloved moment that many Korean American families video and replay for years. Knowing the word names a precious memory."},
+{ko:"결혼식",en:"wedding ceremony",roman:"gyeol-hon-sik",cat:"명절",
+ def:"Korean wedding — typically a blend of modern Western ceremony and traditional 폐백 ritual where the bride formally meets the groom's family.",
+ date:"Modern form developed in the 20th century",why:"Korean American weddings often navigate how much of each tradition to include — knowing both vocabularies helps."},
+{ko:"폐백",en:"paeback — post-wedding family ritual",roman:"pye-baek",cat:"명절",
+ def:"The traditional part of a Korean wedding where the bride formally bows to the groom's family and receives gifts. The groom's family throws 대추 (dates) and chestnuts that the bride catches in her skirt.",
+ date:"Traditional — Joseon era",why:"폐백 is the moment in Korean weddings where generations meet — and where Korean American brides often feel most connected to tradition."},
+{ko:"환갑",en:"hwangap — 60th birthday celebration",roman:"hwan-gap",cat:"명절",
+ def:"The 60th birthday — a major milestone in Korean tradition marking the completion of the full 60-year cycle of the lunar calendar. A celebration of longevity.",
+ date:"Traditional",why:"환갑 parties are events Korean American families organize for parents and grandparents — a chance to honor elders in a deeply Korean way."},
+{ko:"백일",en:"baengil — 100th day celebration",roman:"baek-il",cat:"명절",
+ def:"The baby's 100th day — celebrated because surviving the first 100 days was historically uncertain. Marked with 백설기 (white rice cake) shared with neighbors.",
+ date:"Traditional",why:"백일 is one of the earliest Korean rituals Korean American parents encounter with a new baby — and a beautiful way to connect with tradition."},
+
+// ── 문장 REAL SENTENCES ──────────────────────
+{ko:"밥은 먹었어?",en:"Have you eaten?",roman:"bap-eun meo-geot-seo?",cat:"문장",
+ def:"The quintessential Korean greeting — asking if someone has eaten is how Korean people express care and love.",
+ date:"Conversational",why:"This phrase is more than a question about food — it's 'are you okay? am I taking care of you?' Understanding this unlocks Korean relational language."},
+{ko:"어디 아파?",en:"Does something hurt / are you sick?",roman:"eo-di a-pa?",cat:"문장",
+ def:"'Where does it hurt?' — the first thing Korean parents say when something seems wrong.",
+ date:"Conversational",why:"Korean care is expressed physically — the first response to distress is checking the body."},
+{ko:"조심히 가세요.",en:"Please go carefully / take care.",roman:"jo-sim-hi ga-se-yo",cat:"문장",
+ def:"Said when someone is leaving — wishing them a safe journey, the Korean equivalent of 'take care.'",
+ date:"Conversational",why:"This is the polite farewell every Korean American should know — saying it to elders goes a long way."},
+{ko:"오래간만이에요.",en:"It's been a long time.",roman:"o-rae-gan-man-i-e-yo",cat:"문장",
+ def:"'It's been a long time' — said when reuniting with someone after an absence. A phrase full of warmth and longing.",
+ date:"Conversational",why:"This phrase captures something Korean Americans feel constantly — the long gaps between visits and reunions."},
+{ko:"덕분에 잘 지냈어요.",en:"I've been well, thanks to you.",roman:"deok-bun-e jal ji-naet-seo-yo",cat:"문장",
+ def:"'I've been well, thanks to you' — the Korean way of answering 'how have you been?' that expresses gratitude for the other person's existence in your life.",
+ date:"Conversational",why:"This response reflects the relational nature of Korean communication — your wellbeing is connected to the people around you."},
+{ko:"어떻게 지냈어요?",en:"How have you been?",roman:"eo-tteo-ke ji-naet-seo-yo?",cat:"문장",
+ def:"Formal way of asking how someone has been — used with 어른 and people you don't see often.",
+ date:"Conversational",why:"Knowing the formal vs informal versions of basic phrases is the mark of register awareness."},
+{ko:"감사합니다.",en:"Thank you (formal)",roman:"gam-sa-ham-ni-da",cat:"문장",
+ def:"Formal thank you — the most respectful form. Used with elders, in formal situations, and whenever you want to express deep gratitude.",
+ date:"Conversational",why:"The difference between 감사합니다, 고맙습니다, and 고마워 marks your level of formality — and matters to Korean elders."},
+{ko:"죄송합니다.",en:"I'm sorry / I apologize (formal)",roman:"joe-song-ham-ni-da",cat:"문장",
+ def:"Formal apology — more than 미안해요. Used in serious situations, with elders, or in formal contexts.",
+ date:"Conversational",why:"Knowing when to use 죄송합니다 vs 미안해요 shows cultural and linguistic sophistication."},
+{ko:"한국어를 배우고 있어요.",en:"I'm learning Korean.",roman:"han-gu-geo-reul bae-u-go i-sseo-yo",cat:"문장",
+ def:"'I'm learning Korean' — a sentence that opens doors and earns immediate warmth from Korean speakers.",
+ date:"Conversational",why:"Saying this in Korean causes Korean speakers everywhere to become your biggest supporters."},
+{ko:"조금만 천천히 말해 주세요.",en:"Please speak a little more slowly.",roman:"jo-geum-man cheon-cheon-hi mal-hae ju-se-yo",cat:"문장",
+ def:"'Please speak a little more slowly' — an essential sentence for anyone building their Korean.",
+ date:"Conversational",why:"This is the sentence that keeps conversations alive while you're still building fluency. Korean speakers respect the ask."},
+{ko:"다시 한번 말해 주세요.",en:"Please say it one more time.",roman:"da-si han-beon mal-hae ju-se-yo",cat:"문장",
+ def:"'Please say it one more time' — equally essential for following fast Korean speech.",
+ date:"Conversational",why:"Using these sentences keeps you in Korean conversation rather than switching to English — the key to language maintenance."},
+{ko:"한국말이 너무 어려워요.",en:"Korean is so difficult.",roman:"han-gung-mal-i neo-mu eo-ryeo-wo-yo",cat:"문장",
+ def:"'Korean is really hard' — what every Korean learner says, and every Korean speaker understands.",
+ date:"Conversational",why:"Saying this in Korean is ironic and endearing — it proves you're learning even while complaining you can't."},
+{ko:"우리 같이 한국어로 얘기해요.",en:"Let's talk in Korean together.",roman:"u-ri ga-chi han-gu-geo-ro yae-gi-hae-yo",cat:"문장",
+ def:"'Let's speak Korean together' — an invitation to practice with family or a Korean-speaking friend.",
+ date:"Conversational",why:"This sentence is the whole point of the app — being able to say it, and mean it."},
+{ko:"어디서 오셨어요?",en:"Where are you from? (formal)",roman:"eo-di-seo o-syeot-seo-yo?",cat:"문장",
+ def:"'Where are you from?' in formal speech — respectful way to ask an elder or stranger about their origin.",
+ date:"Conversational",why:"Korean Americans who visit Korea are often asked this — knowing how to answer and ask in return matters."},
+{ko:"저는 한국계 미국인이에요.",en:"I am Korean American.",roman:"jeo-neun han-guk-gye mi-guk-in-i-e-yo",cat:"문장",
+ def:"'I am Korean American' — how to identify yourself in Korean.",
+ date:"Conversational",why:"Being able to name your identity in Korean is meaningful — it says 'this part of me belongs here too.'"},
+];
+
+// ═══════════════════════════════════════════════
+//  CATEGORIES
+// ═══════════════════════════════════════════════
+const CATS = [
+  {id:"all",  label:"All"},
+  {id:"가족",  label:"🏠 가족"},
+  {id:"교회",  label:"⛪ 교회"},
+  {id:"밥상",  label:"🍚 밥상"},
+  {id:"역사",  label:"📜 역사"},
+  {id:"인물",  label:"🧑‍🎓 인물"},
+  {id:"지리",  label:"🗺 지리"},
+  {id:"감정",  label:"💬 감정"},
+  {id:"육아",  label:"👶 육아"},
+  {id:"격식",  label:"📰 격식"},
+  {id:"대중문화",label:"🎵 문화"},
+  {id:"건강",  label:"🏥 건강"},
+  {id:"사회",  label:"🌏 사회"},
+  {id:"명절",  label:"📿 명절"},
+  {id:"문장",  label:"🗣 문장"},
+];
+
+const KB = [
+  [{l:'q',k:'ㅂ'},{l:'w',k:'ㅈ'},{l:'e',k:'ㄷ'},{l:'r',k:'ㄱ'},{l:'t',k:'ㅅ'},{l:'y',k:'ㅛ'},{l:'u',k:'ㅕ'},{l:'i',k:'ㅑ'},{l:'o',k:'ㅐ'},{l:'p',k:'ㅔ'}],
+  [{l:'a',k:'ㅁ'},{l:'s',k:'ㄴ'},{l:'d',k:'ㅇ'},{l:'f',k:'ㄹ'},{l:'g',k:'ㅎ'},{l:'h',k:'ㅗ'},{l:'j',k:'ㅓ'},{l:'k',k:'ㅏ'},{l:'l',k:'ㅣ'}],
+  [{l:'z',k:'ㅋ'},{l:'x',k:'ㅌ'},{l:'c',k:'ㅊ'},{l:'v',k:'ㅍ'},{l:'b',k:'ㅠ'},{l:'n',k:'ㅜ'},{l:'m',k:'ㅡ'}],
+];
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let S = {
+  cat:'all', idx:0, filtered:[], showRoman:true, showDef:false,
+  diff:'easy', startTime:null, timerInt:null, charLen:0,
+  pb:{}, streak:0, wpmHist:[], shuffle:false,
+};
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+function init() {
+  buildPills('cat-pills', CATS, selectCat);
+  buildPills('gloss-pills', CATS, selectGlossCat);
+  buildMiniKb(); buildFullKb(); filterLoad();
+  document.getElementById('input').addEventListener('input', onInput);
+  document.getElementById('input').addEventListener('keydown', onKey);
+  loadStorage();
+}
+
+function loadStorage() {
+  try {
+    const d = JSON.parse(localStorage.getItem('ka_trainer_v1')||'{}');
+    if(d.pb)     S.pb = d.pb;
+    if(d.streak) S.streak = d.streak;
+    if(d.diff)   setDiff(d.diff, true);
+    else          setDiff('easy', true);
+    updateStats(0);
+  } catch(e){ setDiff('easy',true); }
+}
+
+function saveStorage() {
+  try { localStorage.setItem('ka_trainer_v1', JSON.stringify({pb:S.pb, streak:S.streak, diff:S.diff})); } catch(e){}
+}
+
+// ═══════════════════════════════════════════════
+//  PILLS
+// ═══════════════════════════════════════════════
+function buildPills(cid, cats, handler) {
+  const c = document.getElementById(cid); c.innerHTML='';
+  cats.forEach(cat => {
+    const b = document.createElement('button');
+    b.className = 'cat-pill' + (cat.id===S.cat?' active':'');
+    b.textContent = cat.label; b.dataset.id = cat.id;
+    b.onclick = () => handler(cat.id); c.appendChild(b);
+  });
+}
+
+function selectCat(id) {
+  S.cat=id; S.idx=0;
+  document.querySelectorAll('#cat-pills .cat-pill').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
+  filterLoad();
+}
+
+function selectGlossCat(id) {
+  S.cat=id;
+  document.querySelectorAll('#gloss-pills .cat-pill').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
+  renderGlossary();
+}
+
+// ═══════════════════════════════════════════════
+//  PHRASES
+// ═══════════════════════════════════════════════
+function filterLoad() {
+  const base = S.cat==='all' ? [...PHRASES] : PHRASES.filter(p=>p.cat===S.cat);
+  if(S.shuffle) {
+    // Fisher-Yates shuffle
+    for(let i=base.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [base[i],base[j]]=[base[j],base[i]];
+    }
+  }
+  S.filtered = base;
+  if(S.idx>=S.filtered.length) S.idx=0;
+  loadPhrase();
+}
+
+function toggleShuffle() {
+  S.shuffle = !S.shuffle;
+  const btn = document.getElementById('shuffle-btn');
+  btn.textContent = S.shuffle ? '🔀 Shuffled' : '🔀 Shuffle';
+  btn.classList.toggle('btn-active', S.shuffle);
+  btn.style.background = '';
+  btn.style.color = '';
+  btn.style.borderColor = '';
+  S.idx = 0;
+  filterLoad();
+}
+
+function loadPhrase() {
+  const p = S.filtered[S.idx]; if(!p) return;
+  S.charLen = [...p.ko].length;
+  document.getElementById('p-cat').textContent = p.cat;
+  document.getElementById('p-count').textContent = `${S.idx+1} / ${S.filtered.length}`;
+  document.getElementById('e-display').textContent = '→ ' + p.en;
+  document.getElementById('r-display').textContent = S.showRoman ? '[' + p.roman + ']' : '';
+
+  // chars
+  const d = document.getElementById('k-display'); d.innerHTML='';
+  [...p.ko].forEach((ch,i)=>{
+    const sp = document.createElement('span');
+    sp.className='char '+(i===0?'current':'pending');
+    sp.textContent=ch; d.appendChild(sp);
+  });
+
+  // definition
+  const tog = document.getElementById('def-toggle');
+  const box = document.getElementById('def-box');
+  if(p.def){
+    tog.style.display='inline-block';
+    document.getElementById('def-en').textContent = p.def;
+    document.getElementById('def-ko').textContent = '';
+    document.getElementById('def-date').textContent = p.date ? '📅 ' + p.date : '';
+    document.getElementById('def-why').textContent = p.why ? '💡 ' + p.why : '';
+    if(S.showDef){ box.classList.add('visible'); tog.textContent='▾ Context'; }
+    else { box.classList.remove('visible'); tog.textContent='▸ Context'; }
+  } else { tog.style.display='none'; box.classList.remove('visible'); }
+
+  document.getElementById('input').value='';
+  document.getElementById('input').classList.remove('error');
+  resetTimer();
+  updatePB(p.ko);
+
+  const badge = document.getElementById('pb-badge');
+  badge.className='pb-badge hidden'; badge.textContent='';
+
+  const pct = S.filtered.length>1 ? (S.idx/(S.filtered.length-1))*100 : 100;
+  document.getElementById('prog').style.width = pct+'%';
+}
+
+// ═══════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════
+function setDiff(level, silent) {
+  S.diff = level;
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.toggle('active',b.dataset.diff===level));
+  document.getElementById('diff-label').textContent = DIFF[level].emoji;
+  if(!silent) { saveStorage(); }
+}
+
+function startTimer() {
+  stopTimer(); S.startTime=Date.now();
+  S.timerInt = setInterval(tickTimer, 50);
+}
+
+function stopTimer() {
+  if(S.timerInt){ clearInterval(S.timerInt); S.timerInt=null; }
+}
+
+function tickTimer() {
+  if(!S.startTime) return;
+  const el  = (Date.now()-S.startTime)/1000;
+  const pace = DIFF[S.diff].pace;
+  const tgt  = S.charLen*pace;
+  const warn = tgt*WARN, danger = tgt*DANGER;
+  const td = document.getElementById('timer');
+  td.textContent = el.toFixed(1);
+  td.className = 'timer-val'+(el>=danger?' danger':el>=warn?' warning':'');
+  const pct = Math.min(100,(el/danger)*100);
+  const pb  = document.getElementById('pace');
+  pb.style.width = pct+'%';
+  pb.style.background = el>=danger?'var(--wrong)':el>=warn?'#b8860b':'var(--correct)';
+}
+
+function resetTimer() {
+  stopTimer(); S.startTime=null;
+  document.getElementById('timer').textContent='0.0';
+  document.getElementById('timer').className='timer-val';
+  document.getElementById('pace').style.width='0%';
+  document.getElementById('pace').style.background='var(--correct)';
+}
+
+function updatePB(key) {
+  const pb = S.pb[key];
+  document.getElementById('t-pb').textContent = pb ? pb.toFixed(2)+'s' : '—';
+  document.getElementById('t-last').textContent = '—';
+}
+
+// ═══════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════
+function onInput(e) {
+  const inp=e.target, typed=inp.value;
+  const p=S.filtered[S.idx]; if(!p) return;
+  if(!S.startTime && typed.length>0) startTimer();
+  const target=p.ko;
+  document.querySelectorAll('#k-display .char').forEach((sp,i)=>{
+    sp.className='char '+(i<typed.length?(typed[i]===target[i]?'correct':'wrong'):i===typed.length?'current':'pending');
+  });
+  inp.classList.remove('error');
+  if(typed===target){
+    const elapsed=(Date.now()-S.startTime)/1000; stopTimer();
+    document.getElementById('timer').textContent=elapsed.toFixed(2);
+    const wpm=Math.round((target.length/5)/(elapsed/60));
+    const key=p.ko, oldPB=S.pb[key], isNew=!oldPB||elapsed<oldPB;
+    if(isNew) S.pb[key]=parseFloat(elapsed.toFixed(2));
+    document.getElementById('t-last').textContent=elapsed.toFixed(2)+'s';
+    document.getElementById('t-pb').textContent=S.pb[key].toFixed(2)+'s';
+    const badge=document.getElementById('pb-badge');
+    if(isNew){ badge.textContent='🏆 New best! '+elapsed.toFixed(2)+'s'; badge.className='pb-badge gold'; }
+    else { badge.textContent='✓ '+elapsed.toFixed(2)+'s  (best: '+S.pb[key].toFixed(2)+'s)'; badge.className='pb-badge'; }
+    S.streak++; saveStorage(); updateStats(wpm);
+    showFlash(elapsed,wpm); setTimeout(nextPhrase,850);
+  }
+}
+
+function onKey(e) {
+  if(e.key==='Enter') nextPhrase();
+  if(e.key==='Escape'){ document.getElementById('input').value=''; loadPhrase(); }
+}
+
+function nextPhrase() {
+  stopTimer(); S.idx=(S.idx+1)%S.filtered.length; loadPhrase();
+  document.getElementById('input').focus();
+}
+
+function toggleRoman() {
+  S.showRoman=!S.showRoman;
+  const p=S.filtered[S.idx];
+  document.getElementById('r-display').textContent=S.showRoman&&p?'['+p.roman+']':'';
+}
+
+function toggleDef() {
+  S.showDef=!S.showDef;
+  const box=document.getElementById('def-box'), tog=document.getElementById('def-toggle');
+  if(S.showDef){ box.classList.add('visible'); tog.textContent='▾ Context'; }
+  else { box.classList.remove('visible'); tog.textContent='▸ Context'; }
+}
+
+// ═══════════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════════
+function updateStats(wpm) {
+  if(wpm>0){ S.wpmHist.push(wpm); document.getElementById('stat-wpm').textContent=Math.round(S.wpmHist.reduce((a,b)=>a+b,0)/S.wpmHist.length); }
+  document.getElementById('stat-streak').textContent=S.streak;
+}
+
+function showFlash(elapsed,wpm) {
+  const f=document.getElementById('flash');
+  document.getElementById('flash-wpm').textContent=elapsed.toFixed(2)+'s'+(wpm>0?' · '+wpm+' WPM':'');
+  f.classList.add('show'); setTimeout(()=>f.classList.remove('show'),850);
+}
+
+// ═══════════════════════════════════════════════
+//  GLOSSARY
+// ═══════════════════════════════════════════════
+function renderGlossary() {
+  const list=S.cat==='all'?PHRASES:PHRASES.filter(p=>p.cat===S.cat);
+  const grid=document.getElementById('gloss-grid'); grid.innerHTML='';
+  list.forEach(p=>{
+    const div=document.createElement('div'); div.className='gi';
+    div.innerHTML=`
+      <div class="gi-top">
+        <div class="gi-ko">${p.ko}</div>
+        <div class="gi-right">
+          <div class="gi-en">${p.en}</div>
+          <div class="gi-rom">${p.roman}</div>
+          <div class="gi-cat">${p.cat}</div>
+        </div>
+      </div>
+      ${p.def?`<div class="gi-def">
+        <div>${p.def}</div>
+        ${p.date?`<div style="font-size:10px;color:var(--muted);font-style:italic;margin-top:4px;">📅 ${p.date}</div>`:''}
+        ${p.why?`<div class="gi-def-why">💡 ${p.why}</div>`:''}
+      </div>`:''}`;
+    if(p.def){ div.onclick=()=>div.querySelector('.gi-def').classList.toggle('show'); }
+    grid.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  KEYBOARDS
+// ═══════════════════════════════════════════════
+function buildMiniKb() {
+  const kb=document.getElementById('mini-kb');
+  KB.forEach(row=>{
+    const r=document.createElement('div'); r.className='kb-row';
+    row.forEach(k=>{ const d=document.createElement('div'); d.className='key'; d.innerHTML=`<span class="key-ko">${k.k}</span><span class="key-en">${k.l}</span>`; r.appendChild(d); });
+    kb.appendChild(r);
+  });
+}
+function buildFullKb() {
+  const kb=document.getElementById('full-kb');
+  KB.forEach(row=>{
+    const r=document.createElement('div'); r.className='kb-full-row';
+    row.forEach(k=>{ const d=document.createElement('div'); d.className='kb-full-key'; d.innerHTML=`<div class="top">${k.k}</div><div class="bot">${k.l.toUpperCase()}</div>`; r.appendChild(d); });
+    kb.appendChild(r);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════
+function switchTab(tab) {
+  document.getElementById('practice-view').style.display  = tab==='practice'?'block':'none';
+  document.getElementById('glossary-view').style.display  = tab==='glossary'?'block':'none';
+  document.getElementById('keyboard-view').style.display  = tab==='keyboard'?'block':'none';
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['practice','glossary','keyboard'][i]===tab));
+  if(tab==='glossary') renderGlossary();
+  if(tab==='practice') setTimeout(()=>document.getElementById('input').focus(),100);
+}
+
+init();
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{})); }
+</script>
+</body>
+</html>

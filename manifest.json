@@ -1,0 +1,12 @@
+{
+  "name": "Korean American Typing Trainer",
+  "short_name": "한국어 타이핑",
+  "description": "A typing trainer for Korean Americans — closing the gap between home Korean and fluent Korean.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2d5a27",
+  "icons": [
+    { "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
