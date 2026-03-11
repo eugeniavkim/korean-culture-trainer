@@ -45,11 +45,10 @@ Works offline. Installable on iPhone as a home screen app.
 
 ## Install on iPhone
 
-1. Deploy to GitHub Pages (or any static host)
-2. Open the URL in **Safari**
-3. Tap the Share button → **Add to Home Screen**
-4. Open it once on WiFi to cache everything
-5. Works offline from then on
+1. Open the [URL](https://eugeniavkim.github.io/korean-culture-trainer/) in **Safari**
+2. Tap the Share button → **Add to Home Screen**
+3. Open it once on WiFi to cache everything
+4. Works offline from then on
 
 ## Enable Korean keyboard on iPhone
 
@@ -73,7 +72,7 @@ Only `index.html` needs to be updated when making changes. `manifest.json` and `
 
 ## Who this is for
 
-Korean Americans who grew up hearing Korean at home but never formalized it. You understand more than you can say. You know 밥 먹었어? is love, not a question about food. You freeze up when Korean relatives talk to you. This is the gap this trainer is designed to close.
+Korean Americans who grew up hearing Korean at home but never formalized it. You understand more than you can say. This is the gap this trainer is designed to close.
 
 ---
 
